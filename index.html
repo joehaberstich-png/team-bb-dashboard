@@ -1,225 +1,447 @@
-                            automation.
-                        </div>
-                        <div class="work-actions">
-                            <button class="btn btn-success" onclick="triggerAutomation(4)">
-                                <i class="fas fa-play"></i> Trigger Implementation
-                            </button>
-                        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team BB Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-draft { background: #fff3cd; color: #856404; }
+        .status-review { background: #cce5ff; color: #004085; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-published { background: #d1ecf1; color: #0c5460; }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .agent-section {
+            margin-bottom: 30px;
+        }
+        
+        .agent-title {
+            font-size: 1.5rem;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .work-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .work-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .work-description {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .notification {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: #f39c12;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                padding: 12px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Team BB Dashboard</h1>
+            <p>Real-time workflow management & automation control</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">
+                <i class="fas fa-tachometer-alt"></i> Overview
+            </button>
+            <button class="tab" onclick="switchTab('agents')">
+                <i class="fas fa-users"></i> Agent Work
+            </button>
+            <button class="tab" onclick="switchTab('review')">
+                <i class="fas fa-clipboard-check"></i> Pending Review
+            </button>
+            <button class="tab" onclick="switchTab('automation')">
+                <i class="fas fa-robot"></i> Automation
+            </button>
+        </div>
+        
+        <div id="overview" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">System Status</div>
+                        <span class="status-badge status-published">Active</span>
                     </div>
-                    
-                    <div class="work-item approved" style="margin-bottom: 15px;">
-                        <div class="work-header">
-                            <div class="work-title">Project Dashboard MVP</div>
-                            <span class="status-badge status-approved">Ready for Trigger</span>
-                        </div>
-                        <div class="work-description">
-                            Dashboard design approved. Click below to trigger GitHub deployment
-                        </div>
-                        <div class="work-actions">
-                            <button class="btn btn-success" onclick="triggerAutomation(5)">
-                                <i class="fas fa-rocket"></i> Trigger Deployment
-                            </button>
-                        </div>
+                    <p>All systems operational</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 95%"></div>
                     </div>
+                    <div>95% Uptime</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Projects</div>
+                        <span class="status-badge status-review">5 Projects</span>
+                    </div>
+                    <p>Currently tracking 5 active projects</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div>75% Completion Rate</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Team Performance</div>
+                        <span class="status-badge status-approved">9 Agents</span>
+                    </div>
+                    <p>Full 9-agent team active</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 88%"></div>
+                    </div>
+                    <div>88% Efficiency</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Automation Ready</div>
+                        <span class="status-badge status-approved">2 Ready</span>
+                    </div>
+                    <p>2 workflows ready for automation</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                    <div>40% Automated</div>
+                </div>
+            </div>
+            
+            <div class="notification">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Dashboard Deployed Successfully!</strong><br>
+                    This single-file dashboard is ready for use. No server needed.
+                </div>
+            </div>
+        </div>
+        
+        <div id="agents" class="tab-content">
+            <div class="agent-section">
+                <h3 class="agent-title">Marketing Boss</h3>
+                <div class="work-item">
+                    <div class="work-title">Project-Promotion Promotion Strategy</div>
+                    <div class="work-description">Complete low-cost promotion strategy for $500 Amazon gift card contest.</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-primary">Review</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="agent-section">
+                <h3 class="agent-title">Web Developer</h3>
+                <div class="work-item">
+                    <div class="work-title">Website-Project Home Page Design</div>
+                    <div class="work-description">Modern, conversion-optimized home page design with mobile responsiveness.</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-primary">Review</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="agent-section">
+                <h3 class="agent-title">Operations Boss</h3>
+                <div class="work-item">
+                    <div class="work-title">Automation-System Automation System Design</div>
+                    <div class="work-description">Complete automation system design for medical content publishing.</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-success" onclick="approveWork(4)">Approve</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="review" class="tab-content">
+            <h3>Items Awaiting Review (3)</h3>
+            
+            <div class="work-item">
+                <div class="work-title">Project-Promotion Promotion Strategy</div>
+                <div class="work-description">Marketing Boss - Ready for review</div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary">View Details</button>
+                    <button class="btn btn-success">Approve</button>
+                    <button class="btn btn-warning">Request Edit</button>
+                </div>
+            </div>
+            
+            <div class="work-item">
+                <div class="work-title">Small Business Financing Email Templates</div>
+                <div class="work-description">Content Writer - 10 email templates ready</div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary">View Details</button>
+                    <button class="btn btn-success">Approve</button>
+                    <button class="btn btn-warning">Request Edit</button>
+                </div>
+            </div>
+            
+            <div class="work-item">
+                <div class="work-title">Website-Project Home Page Design</div>
+                <div class="work-description">Web Developer - Design mockups complete</div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary">View Details</button>
+                    <button class="btn btn-success">Approve</button>
+                    <button class="btn btn-warning">Request Edit</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="automation" class="tab-content">
+            <h3>Ready for Automation (2)</h3>
+            
+            <div class="work-item">
+                <div class="work-title">Automation-System Automation System</div>
+                <div class="work-description">Approved - Ready for implementation</div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-success" onclick="triggerAutomation(1)">
+                        <i class="fas fa-play"></i> Trigger Implementation
+                    </button>
+                </div>
+            </div>
+            
+            <div class="work-item">
+                <div class="work-title">Project Dashboard MVP</div>
+                <div class="work-description">Approved - Ready for deployment</div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-success" onclick="triggerAutomation(2)">
+                        <i class="fas fa-rocket"></i> Trigger Deployment
+                    </button>
+                </div>
+            </div>
+            
+            <div class="notification">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>Automation Tips:</strong><br>
+                    Click "Trigger" buttons to simulate automation workflows. In production, these would connect to real APIs.
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Review Modal -->
-    <div id="review-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Review Work</div>
-                <button class="close-modal" onclick="closeModal()">×</button>
-            </div>
-            <div id="modal-content">
-                <!-- Dynamic content will be loaded here -->
-            </div>
-        </div>
-    </div>
-    
     <script>
-        // Sample data
-        const works = {
-            1: {
-                title: "Project-Promotion Promotion Strategy",
-                agent: "Marketing Boss",
-                status: "review",
-                progress: 100,
-                description: "Complete low-cost promotion strategy for $500 Amazon gift card contest.",
-                content: `## Promotion Strategy Document
-
-### Channels Selected:
-1. **Reddit Communities** - r/beermoney, r/sweepstakes
-2. **Facebook Groups** - Contest & Giveaway groups
-3. **Twitter Hashtags** - #giveaway #contest #amazongiftcard
-4. **Partnership Outreach** - Related websites/blogs
-
-### Budget Allocation:
-- Reddit ads: $50
-- Facebook boosted posts: $30
-- Partnership incentives: $20
-- Total: $100
-
-### Timeline:
-- Week 1: Setup & initial posts
-- Week 2: Partnership outreach
-- Week 3: Social media push
-- Week 4: Final promotion & winner selection
-
-### Expected Results:
-- 500+ contest entries
-- 50+ website signups
-- 20+ social media shares
-- 5+ partnership mentions`,
-                automation: "Execute promotion channels across selected platforms"
-            },
-            2: {
-                title: "Small Business Financing Email Templates",
-                agent: "Content Writer",
-                status: "review",
-                progress: 100,
-                description: "5 email templates for cold outreach to small businesses.",
-                content: `## Email Campaign Package
-
-### Template 1: Initial Outreach
-**Subject:** Quick question about your business financing
-**Body:** Personalized introduction + value proposition
-
-### Template 2: Follow-up (3 days)
-**Subject:** Following up on financing options
-**Body:** Additional benefits + case study
-
-### Template 3: Value-add (7 days)
-**Subject:** Free financing assessment
-**Body:** Offer free analysis + testimonials
-
-### Template 4: Final attempt (14 days)
-**Subject:** Last chance for special offer
-**Body:** Limited-time offer + urgency
-
-### Template 5: Breakup (21 days)
-**Subject:** Closing your file
-**Body:** Polite closure + future availability
-
-### Compliance Notes:
-- CAN-SPAM compliant
-- GDPR considerations included
-- Opt-out instructions clear
-- No misleading claims`,
-                automation: "Set up email sequences in campaign software"
-            },
-            3: {
-                title: "Website-Project Home Page Design",
-                agent: "Web Developer",
-                status: "review",
-                progress: 40,
-                description: "Home page design for pharmaceutical information website.",
-                content: `## Design Specifications
-
-### Layout Structure:
-1. **Hero Section** - Large banner with search
-2. **Features Grid** - 4 key features with icons
-3. **Latest Articles** - 3-column article previews
-4. **Disclaimer Section** - Medical disclaimer
-5. **Footer** - Navigation & contact
-
-### Technical Details:
-- Responsive design (mobile-first)
-- CSS Grid/Flexbox layout
-- Font: Open Sans / Poppins
-- Color scheme: Medical blue/white
-- Loading time: < 2 seconds
-
-### Pages to Build:
-1. Home page (current)
-2. Drug information pages
-3. Side effects database
-4. Interaction checker
-5. Blog/articles section
-
-### Next Steps:
-- Complete remaining pages
-- Add JavaScript functionality
-- Implement search feature
-- SEO optimization`,
-                automation: "Continue development of additional pages"
-            },
-            4: {
-                title: "Automation-System Automation System Design",
-                agent: "Operations Boss",
-                status: "approved",
-                progress: 100,
-                description: "Automation system design for daily content generation.",
-                content: `## System Architecture
-
-### Components:
-1. **Content Pipeline** - AI-assisted article generation
-2. **News Aggregation** - RSS feed processing
-3. **Social Automation** - Multi-platform posting
-4. **Quality Control** - Editorial review system
-
-### Technical Requirements:
-- AI API integration (OpenAI/Claude)
-- RSS parser implementation
-- Social media APIs (FB, IG, Twitter, Pinterest)
-- WordPress REST API
-- Database for scheduling
-
-### Implementation Phases:
-1. MVP (4 weeks) - Basic automation
-2. Enhancement (4 weeks) - Advanced features
-3. Scaling (4 weeks) - Full automation
-4. Optimization (ongoing) - Continuous improvement
-
-### Cost Estimate:
-- Development: $10,000-$20,000
-- Monthly: $400-$1,200
-- ROI: 50-200% traffic increase in 6 months`,
-                automation: "Begin technical implementation phase"
-            },
-            5: {
-                title: "Project Dashboard MVP",
-                agent: "Web Developer",
-                status: "approved",
-                progress: 100,
-                description: "Minimum viable product for project tracking dashboard.",
-                content: `## Dashboard Features
-
-### Current Version:
-- Project status tracking
-- Agent work display
-- Progress visualization
-- Basic workflow management
-
-### Deployment Ready:
-- Single HTML file
-- Self-contained CSS/JS
-- No external dependencies
-- Mobile responsive
-
-### GitHub Pages Deployment:
-1. Create private repository
-2. Upload index.html
-3. Enable GitHub Pages
-4. Add password protection
-
-### Future Enhancements:
-1. Real-time updates
-2. Database integration
-3. User authentication
-4. Advanced analytics
-5. API integrations`,
-                automation: "Deploy to GitHub Pages with password protection"
-            }
-        };
-        
-        // Tab management
-        function showTab(tabName) {
-            // Hide all tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = 'none';
+                tab.classList.remove('active');
             });
             
             // Remove active class from all tabs
@@ -227,209 +449,49 @@
                 tab.classList.remove('active');
             });
             
-            // Show selected tab
-            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
             
-            // Add active class to clicked tab
+            // Activate clicked tab
             event.target.classList.add('active');
         }
         
-        // Modal functions
-        let currentWorkId = null;
-        
-        function reviewWork(workId) {
-            currentWorkId = workId;
-            const work = works[workId];
-            
-            document.getElementById('modal-content').innerHTML = `
-                <div>
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;">${work.title}</div>
-                        <div style="color: var(--text-muted);">Submitted by: ${work.agent}</div>
-                    </div>
-                    
-                    <div class="work-preview">
-                        ${work.content}
-                    </div>
-                    
-                    <div class="comment-section">
-                        <h4 style="margin-bottom: 10px;">Add Comment/Feedback</h4>
-                        <textarea class="comment-input" rows="3" placeholder="Add your comments or feedback here..."></textarea>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button class="btn btn-success" onclick="approveWork(${workId})">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="btn btn-warning" onclick="requestEdit(${workId})">
-                                <i class="fas fa-edit"></i> Request Edit
-                            </button>
-                            <button class="btn btn-danger" onclick="rejectWork(${workId})">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('review-modal').style.display = 'flex';
-        }
-        
-        function closeModal() {
-            document.getElementById('review-modal').style.display = 'none';
-            currentWorkId = null;
-        }
-        
-        // Workflow actions
         function approveWork(workId) {
-            const work = works[workId];
-            
-            // Update status
-            work.status = 'approved';
-            
-            // Show success message
-            alert(`✅ "${work.title}" has been approved!\n\nAutomation trigger: ${work.automation}`);
-            
-            // Update UI
-            updateWorkItem(workId);
-            
-            // Close modal if open
-            closeModal();
-            
-            // In production, this would trigger actual automation
-            console.log(`Automation triggered for work ${workId}: ${work.automation}`);
+            alert(`Work #${workId} approved! Automation triggered.`);
+            // In production: API call to approve and trigger automation
         }
         
-        function requestEdit(workId) {
-            const work = works[workId];
-            const comment = document.querySelector('.comment-input')?.value || 'No specific feedback provided';
-            
-            // Update status (in real system, would go back to draft)
-            work.status = 'review'; // Keep in review for now
-            
-            // Show edit request message
-            alert(`✏️ Edit requested for "${work.title}"\n\nFeedback: ${comment}\n\nWork has been sent back to ${work.agent} for revisions.`);
-            
-            // Update UI
-            updateWorkItem(workId);
-            
-            // Close modal if open
-            closeModal();
+        function triggerAutomation(automationId) {
+            const messages = [
+                "🚀 Automation started: Deploying to production...",
+                "🤖 Automation started: Implementing system design...",
+                "⚡ Automation triggered: Starting workflow..."
+            ];
+            alert(messages[automationId - 1] || "Automation triggered successfully!");
+            // In production: API call to trigger actual automation
         }
         
-        function rejectWork(workId) {
-            const work = works[workId];
-            const comment = document.querySelector('.comment-input')?.value || 'No specific reason provided';
-            
-            // Update status
-            work.status = 'review'; // In real system, might have 'rejected' status
-            
-            // Show rejection message
-            alert(`❌ "${work.title}" has been rejected.\n\nReason: ${comment}\n\nWork has been sent back to ${work.agent}.`);
-            
-            // Update UI
-            updateWorkItem(workId);
-            
-            // Close modal if open
-            closeModal();
-        }
-        
-        function triggerAutomation(workId) {
-            const work = works[workId];
-            
-            // Show automation trigger message
-            alert(`⚡ Automation triggered for "${work.title}"\n\nAction: ${work.automation}\n\nAutomation process has been started.`);
-            
-            // Update status to show automation in progress
-            work.status = 'published'; // In real system, might have 'executing' status
-            
-            // Update UI
-            updateWorkItem(workId);
-            
-            // In production, this would start the actual automation
-            console.log(`Starting automation for work ${workId}: ${work.automation}`);
-            
-            // Simulate automation completion after delay
-            setTimeout(() => {
-                alert(`✅ Automation completed for "${work.title}"\n\nThe automation process has finished successfully.`);
-            }, 2000);
-        }
-        
-        function updateWorkItem(workId) {
-            const work = works[workId];
-            const workElement = document.querySelector(`.work-item[data-id="${workId}"]`);
-            
-            if (workElement) {
-                // Update status badge
-                const badge = workElement.querySelector('.status-badge');
-                badge.className = `status-badge status-${work.status}`;
-                badge.textContent = work.status.charAt(0).toUpperCase() + work.status.slice(1);
-                
-                // Update border color
-                workElement.className = `work-item ${work.status}`;
-                
-                // Update actions based on status
-                const actions = workElement.querySelector('.work-actions');
-                if (actions) {
-                    if (work.status === 'approved') {
-                        actions.innerHTML = `
-                            <button class="btn btn-success" onclick="triggerAutomation(${workId})">
-                                <i class="fas fa-play"></i> Trigger Automation
-                            </button>
-                            <button class="btn btn-primary" onclick="reviewWork(${workId})">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        `;
-                    } else if (work.status === 'published') {
-                        actions.innerHTML = `
-                            <button class="btn btn-success" disabled>
-                                <i class="fas fa-check"></i> Automation Complete
-                            </button>
-                        `;
-                    }
-                }
-            }
-            
-            // Refresh counts
-            updateCounts();
-        }
-        
-        function updateCounts() {
-            // Count items in each status
-            const counts = {
-                review: 0,
-                approved: 0,
-                published: 0
-            };
-            
-            Object.values(works).forEach(work => {
-                if (counts[work.status] !== undefined) {
-                    counts[work.status]++;
+        // Simulate real-time updates
+        setInterval(() => {
+            const badges = document.querySelectorAll('.status-badge');
+            badges.forEach(badge => {
+                if (badge.classList.contains('status-review')) {
+                    // Pulse animation for review items
+                    badge.style.animation = 'pulse 2s infinite';
                 }
             });
-            
-            // Update badge counts
-            const reviewBadge = document.querySelector('.card-header .status-review');
-            const approvedBadge = document.querySelector('.card-header .status-approved');
-            
-            if (reviewBadge) {
-                reviewBadge.textContent = `${counts.review} items`;
-            }
-            
-            if (approvedBadge) {
-                approvedBadge.textContent = `${counts.approved} items`;
-            }
-        }
+        }, 3000);
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCounts();
-            
-            // Close modal on outside click
-            document.getElementById('review-modal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('review-modal')) {
-                    closeModal();
-                }
-            });
-        });
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
