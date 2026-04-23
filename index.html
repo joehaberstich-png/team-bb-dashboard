@@ -10,7 +10,7 @@
         .container { max-width: 1400px; margin: 0 auto; }
         .header { background: linear-gradient(135deg, #2c3e50, #1a252f); color: white; padding: 25px; border-radius: 10px 10px 0 0; }
         .tabs { display: flex; background: #34495e; }
-        .tab { padding: 15px 30px; color: white; cursor: pointer; border: none; background: none; }
+        .tab { padding: 15px 30px; color: white; cursor: pointer; border: none; background: none; font-size: 16px; }
         .tab.active { background: #1abc9c; }
         .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; }
         .section { margin-bottom: 40px; }
@@ -65,38 +65,18 @@
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('projects')">Projects</button>
-            <button class="tab" onclick="switchTab('approval')">Approval Queue</button>
-            <button class="tab" onclick="switchTab('outputs')">All Outputs</button>
-            <button class="tab" onclick="switchTab('activity')">Activity</button>
+            <button class="tab active" onclick="switchTab('projects', this)">Projects</button>
+            <button class="tab" onclick="switchTab('approval', this)">Approval Queue</button>
+            <button class="tab" onclick="switchTab('outputs', this)">All Outputs</button>
+            <button class="tab" onclick="switchTab('activity', this)">Activity</button>
         </div>
         
         <div class="content">
             <div id="projects" class="tab-content">
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="total-projects">4</div>
-                        <div class="stat-label">Active Projects</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="pending-approval">2</div>
-                        <div class="stat-label">Pending Approval</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="files-available">12</div>
-                        <div class="stat-label">Files Available</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="agents-active">9</div>
-                        <div class="stat-label">Agents Active</div>
-                    </div>
-                </div>
-                
                 <div class="section">
                     <h2 class="section-title">Active Projects with Real Outputs</h2>
-                    <div class="project-grid" id="projects-grid">
-                        <!-- Projects will be loaded here -->
-                    </div>
+                    <div class="stats" id="stats"></div>
+                    <div class="project-grid" id="projects-grid"></div>
                 </div>
             </div>
             
@@ -137,7 +117,17 @@
     </div>
     
     <script>
-        // Real project data with actual outputs
+        // ============================================================
+        // PROJECT DATA — All URLs are actual GitHub Pages paths within
+        // this repo (team-bb-dashboard), served via GitHub Pages.
+        // The raw file viewer links use the gh-page host so they render
+        // as Markdown/HTML in the browser.
+        // ============================================================
+        const GITHUB_USER = "joehaberstich-png";
+        const REPO = "team-bb-dashboard";
+        const BASE_URL = "https://" + GITHUB_USER + ".github.io/" + REPO;
+        const RAW_BASE = "https://raw.githubusercontent.com/" + GITHUB_USER + "/" + REPO + "/main";
+
         const projects = [
             {
                 id: 1,
@@ -147,20 +137,20 @@
                 progress: 90,
                 description: "$500 Amazon gift card contest promotion strategy",
                 outputs: [
-                    { 
-                        name: "Full Strategy Document", 
+                    {
+                        name: "Full Strategy Document",
                         type: "markdown",
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/agent-dashboard/main/TheDealWizard_Promotion_Strategy.md",
+                        url: BASE_URL + "/bb_projects/TheDealWizard_Promotion_Strategy.md",
                         preview: "Complete low-cost promotion plan with Reddit, Facebook, and partnership strategies"
                     },
                     {
                         name: "Optimization Plan",
-                        type: "markdown", 
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/agent-dashboard/main/dealwizard_optimization_plan.md",
+                        type: "markdown",
+                        url: BASE_URL + "/bb_projects/dealwizard_optimization_plan.md",
                         preview: "Entry mechanism enhancements and virality features"
                     }
                 ],
-                githubUrl: "https://github.com/joehaberstich-png/agent-dashboard/blob/main/TheDealWizard_Promotion_Strategy.md",
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/bb_projects/TheDealWizard_Promotion_Strategy.md",
                 lastUpdated: "2026-04-21",
                 needsApproval: true
             },
@@ -175,11 +165,11 @@
                     {
                         name: "Email Strategy Document",
                         type: "markdown",
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/agent-dashboard/main/Small_Business_Financing_Emails.md",
+                        url: BASE_URL + "/bb_projects/Small_Business_Financing_Emails.md",
                         preview: "Complete email templates with CAN-SPAM/GDPR compliance"
                     }
                 ],
-                githubUrl: "https://github.com/joehaberstich-png/agent-dashboard/blob/main/Small_Business_Financing_Emails.md",
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/bb_projects/Small_Business_Financing_Emails.md",
                 lastUpdated: "2026-04-21",
                 needsApproval: true
             },
@@ -194,17 +184,17 @@
                     {
                         name: "Development Framework",
                         type: "html",
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/agent-dashboard/main/cracksup.com/index.html",
+                        url: BASE_URL + "/bb_projects/DrugDoctors/index.html",
                         preview: "HTML/CSS framework structure"
                     },
                     {
                         name: "Site Preview",
                         type: "preview",
-                        url: "https://joehaberstich-png.github.io/agent-dashboard/cracksup.com/index.html",
+                        url: BASE_URL + "/bb_projects/DrugDoctors/index.html",
                         preview: "Live site preview (example framework)"
                     }
                 ],
-                githubUrl: "https://github.com/joehaberstich-png/agent-dashboard/tree/main/cracksup.com",
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/tree/main/bb_projects/DrugDoctors",
                 lastUpdated: "2026-04-22",
                 needsApproval: false
             },
@@ -219,11 +209,11 @@
                     {
                         name: "Automation System Design",
                         type: "markdown",
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/agent-dashboard/main/AllAboutMD_Automation_System.md",
+                        url: BASE_URL + "/bb_projects/AllAboutMD_Automation_System.md",
                         preview: "Complete system design with RSS integration and social automation"
                     }
                 ],
-                githubUrl: "https://github.com/joehaberstich-png/agent-dashboard/blob/main/AllAboutMD_Automation_System.md",
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/bb_projects/AllAboutMD_Automation_System.md",
                 lastUpdated: "2026-04-21",
                 needsApproval: false
             },
@@ -238,333 +228,352 @@
                     {
                         name: "Dashboard Live Version",
                         type: "preview",
-                        url: "https://joehaberstich-png.github.io/team-bb-dashboard/",
+                        url: BASE_URL + "/",
                         preview: "Working dashboard with localStorage persistence"
                     },
                     {
                         name: "Dashboard Source Code",
                         type: "html",
-                        url: "https://raw.githubusercontent.com/joehaberstich-png/team-bb-dashboard/main/index.html",
+                        url: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/index.html",
                         preview: "Complete HTML/CSS/JavaScript source"
                     }
                 ],
-                githubUrl: "https://github.com/joehaberstich-png/team-bb-dashboard",
-                lastUpdated: "2026-04-22",
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO,
+                lastUpdated: "2026-04-23",
+                needsApproval: false
+            },
+            {
+                id: 6,
+                title: "FlyToAustralia.com Website",
+                agent: "Web Developer",
+                status: "in-progress",
+                progress: 25,
+                description: "Full travel information and booking resource website for Australia",
+                outputs: [
+                    {
+                        name: "Website Plan & Specs",
+                        type: "markdown",
+                        url: BASE_URL + "/bb_projects/FlyToAustralia_Website.md",
+                        preview: "Complete website plan with pages, design specs, and milestones"
+                    }
+                ],
+                githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/bb_projects/FlyToAustralia_Website.md",
+                lastUpdated: "2026-04-23",
                 needsApproval: false
             }
         ];
-        
-        // Activity log
+
+        // ============================================================
+        // ACTIVITY LOG (with localStorage persistence)
+        // ============================================================
         let activity = JSON.parse(localStorage.getItem('bb-activity')) || [];
-        
-        // Initialize activity
+
         if (activity.length === 0) {
             activity = [
                 { message: "Dashboard initialized with real project outputs", time: new Date().toLocaleTimeString() },
                 { message: "TheDealWizard.com strategy document available for review", time: new Date().toLocaleTimeString() },
                 { message: "Small business financing emails ready for approval", time: new Date().toLocaleTimeString() },
-                { message: "DrugDoctors.com framework deployed to GitHub", time: new Date().toLocaleTimeString() }
+                { message: "DrugDoctors.com framework deployed to GitHub", time: new Date().toLocaleTimeString() },
+                { message: "FlyToAustralia.com project added to dashboard", time: new Date().toLocaleTimeString() }
             ];
             localStorage.setItem('bb-activity', JSON.stringify(activity));
         }
-        
-        // Tab switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-            event.target.classList.add('active');
+
+        // ============================================================
+        // TAB SWITCHING
+        // ============================================================
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.style.display = 'none'; });
+            if (btn) btn.classList.add('active');
             document.getElementById(tabName).style.display = 'block';
-            
-            if (tabName === 'projects') renderProjects();
+
+            if (tabName === 'projects') { renderProjects(); renderStats(); }
             if (tabName === 'approval') renderApprovalQueue();
             if (tabName === 'outputs') renderAllOutputs();
             if (tabName === 'activity') renderActivity();
         }
-        
-        // Render projects
+
+        // ============================================================
+        // STATS
+        // ============================================================
+        function renderStats() {
+            var el = document.getElementById('stats');
+            if (!el) return;
+            var active = projects.filter(function(p) { return p.status === 'in-progress'; }).length;
+            var pending = projects.filter(function(p) { return p.needsApproval; }).length;
+            var files = 0;
+            projects.forEach(function(p) { files += p.outputs.length; });
+            el.innerHTML =
+                '<div class="stat-card"><div class="stat-value">' + active + '</div><div class="stat-label">Active Projects</div></div>' +
+                '<div class="stat-card"><div class="stat-value">' + pending + '</div><div class="stat-label">Pending Approval</div></div>' +
+                '<div class="stat-card"><div class="stat-value">' + files + '</div><div class="stat-label">Files Available</div></div>' +
+                '<div class="stat-card"><div class="stat-value">' + projects.length + '</div><div class="stat-label">All Projects</div></div>';
+        }
+
+        // ============================================================
+        // RENDER PROJECTS
+        // ============================================================
         function renderProjects() {
-            const container = document.getElementById('projects-grid');
+            var container = document.getElementById('projects-grid');
             if (!container) return;
-            
-            container.innerHTML = projects.map(project => `
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-title">${project.title}</div>
-                        <span class="project-status status-${project.status}">${project.status.toUpperCase().replace('-', ' ')}</span>
-                    </div>
-                    <div class="project-meta">
-                        <strong>Agent:</strong> ${project.agent} | 
-                        <strong>Progress:</strong> ${project.progress}% |
-                        <strong>Updated:</strong> ${project.lastUpdated}
-                    </div>
-                    <div class="project-description">${project.description}</div>
-                    
-                    <div class="outputs">
-                        <div class="output-title">📁 Available Outputs:</div>
-                        <ul class="file-list">
-                            ${project.outputs.map(output => `
-                                <li class="file-item">
-                                    <a href="${output.url}" target="_blank" class="file-link">${output.name}</a>
-                                    <div style="font-size: 12px; color: #666; margin-top: 3px;">${output.preview}</div>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                    
-                    <div class="btn-group">
-                        ${project.outputs.map((output, index) => `
-                            <button class="btn btn-info" onclick="previewOutput(${project.id}, ${index})">
-                                Preview ${output.type === 'preview' ? 'Live' : 'File'}
-                            </button>
-                        `).join('')}
-                        
-                        ${project.needsApproval ? `
-                            <button class="btn btn-success" onclick="approveProject(${project.id})">Approve</button>
-                            <button class="btn btn-warning" onclick="requestChanges(${project.id})">Request Changes</button>
-                            <button class="btn btn-primary" onclick="viewDetails(${project.id})">Full Review</button>
-                        ` : `
-                            <button class="btn btn-primary" onclick="viewDetails(${project.id})">View Details</button>
-                        `}
-                        
-                        <a href="${project.githubUrl}" target="_blank" class="btn" style="background: #24292e; color: white;">
-                            <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                            </svg>
-                            GitHub
-                        </a>
-                    </div>
-                </div>
-            `).join('');
+
+            container.innerHTML = projects.map(function(project) {
+                var outputsHtml = project.outputs.map(function(output) {
+                    return '<li class="file-item">' +
+                        '<a href="' + output.url + '" target="_blank" class="file-link">' + output.name + '</a>' +
+                        '<div style="font-size: 12px; color: #666; margin-top: 3px;">' + output.preview + '</div>' +
+                        '</li>';
+                }).join('');
+
+                var previewBtns = project.outputs.map(function(output, index) {
+                    return '<button class="btn btn-info" onclick="previewOutput(' + project.id + ', ' + index + ')">Preview ' + (output.type === 'preview' ? 'Live' : 'File') + '</button>';
+                }).join('');
+
+                var actionBtns = project.needsApproval
+                    ? '<button class="btn btn-success" onclick="approveProject(' + project.id + ')">Approve</button>' +
+                      '<button class="btn btn-warning" onclick="requestChanges(' + project.id + ')">Request Changes</button>' +
+                      '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">Full Review</button>'
+                    : '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">View Details</button>';
+
+                return '<div class="project-card">' +
+                    '<div class="project-header">' +
+                    '<div class="project-title">' + project.title + '</div>' +
+                    '<span class="project-status status-' + project.status + '">' + project.status.toUpperCase().replace('-', ' ') + '</span>' +
+                    '</div>' +
+                    '<div class="project-meta"><strong>Agent:</strong> ' + project.agent + ' | <strong>Progress:</strong> ' + project.progress + '% | <strong>Updated:</strong> ' + project.lastUpdated + '</div>' +
+                    '<div class="project-description">' + project.description + '</div>' +
+                    '<div class="outputs"><div class="output-title">📁 Available Outputs:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
+                    '<div class="btn-group">' + previewBtns + actionBtns +
+                    '<a href="' + project.githubUrl + '" target="_blank" class="btn" style="background: #24292e; color: white;">' +
+                    '<svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;" viewBox="0 0 16 16" fill="currentColor">' +
+                    '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>' +
+                    '</svg>GitHub</a>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
         }
-        
-        // Render approval queue
+
+        // ============================================================
+        // RENDER APPROVAL QUEUE
+        // ============================================================
         function renderApprovalQueue() {
-            const container = document.getElementById('approval-queue');
+            var container = document.getElementById('approval-queue');
             if (!container) return;
-            
-            const reviewProjects = projects.filter(p => p.needsApproval);
-            container.innerHTML = reviewProjects.map(project => `
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-title">${project.title}</div>
-                        <span class="project-status status-review">AWAITING APPROVAL</span>
-                    </div>
-                    <div class="project-meta">
-                        <strong>Agent:</strong> ${project.agent} | 
-                        <strong>Progress:</strong> ${project.progress}%
-                    </div>
-                    
-                    <div class="outputs">
-                        <div class="output-title">📄 Outputs to Review:</div>
-                        <ul class="file-list">
-                            ${project.outputs.map(output => `
-                                <li class="file-item">
-                                    <a href="${output.url}" target="_blank" class="file-link">${output.name}</a>
-                                    <button class="btn" style="padding: 3px 8px; font-size: 12px; margin-left: 10px;" onclick="previewOutput(${project.id}, ${project.outputs.indexOf(output)})">
-                                        Preview
-                                    </button>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button class="btn btn-success" onclick="approveProject(${project.id})">✅ Approve Project</button>
-                        <button class="btn btn-warning" onclick="requestChanges(${project.id})">✏️ Request Changes</button>
-                        <button class="btn btn-danger" onclick="rejectProject(${project.id})">❌ Reject</button>
-                        <button class="btn btn-primary" onclick="viewDetails(${project.id})">📋 Full Review</button>
-                    </div>
-                </div>
-            `).join('');
+
+            var reviewProjects = projects.filter(function(p) { return p.needsApproval; });
+            container.innerHTML = reviewProjects.map(function(project) {
+                var outputsHtml = project.outputs.map(function(output) {
+                    return '<li class="file-item">' +
+                        '<a href="' + output.url + '" target="_blank" class="file-link">' + output.name + '</a>' +
+                        '<button class="btn" style="padding: 3px 8px; font-size: 12px; margin-left: 10px;" onclick="previewOutput(' + project.id + ', ' + project.outputs.indexOf(output) + ')">Preview</button>' +
+                        '</li>';
+                }).join('');
+
+                return '<div class="project-card">' +
+                    '<div class="project-header">' +
+                    '<div class="project-title">' + project.title + '</div>' +
+                    '<span class="project-status status-review">AWAITING APPROVAL</span>' +
+                    '</div>' +
+                    '<div class="project-meta"><strong>Agent:</strong> ' + project.agent + ' | <strong>Progress:</strong> ' + project.progress + '%</div>' +
+                    '<div class="outputs"><div class="output-title">📄 Outputs to Review:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
+                    '<div class="btn-group">' +
+                    '<button class="btn btn-success" onclick="approveProject(' + project.id + ')">✅ Approve Project</button>' +
+                    '<button class="btn btn-warning" onclick="requestChanges(' + project.id + ')">✏️ Request Changes</button>' +
+                    '<button class="btn btn-danger" onclick="rejectProject(' + project.id + ')">❌ Reject</button>' +
+                    '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">📋 Full Review</button>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
         }
-        
-        // Render all outputs
+
+        // ============================================================
+        // RENDER ALL OUTPUTS
+        // ============================================================
         function renderAllOutputs() {
-            const container = document.getElementById('all-outputs');
+            var container = document.getElementById('all-outputs');
             if (!container) return;
-            
-            let allOutputs = [];
-            projects.forEach(project => {
-                project.outputs.forEach(output => {
+
+            var allOutputs = [];
+            projects.forEach(function(p) {
+                p.outputs.forEach(function(o) {
                     allOutputs.push({
-                        project: project.title,
-                        agent: project.agent,
-                        ...output
+                        name: o.name,
+                        type: o.type,
+                        url: o.url,
+                        preview: o.preview,
+                        project: p.title,
+                        agent: p.agent
                     });
                 });
             });
-            
-            container.innerHTML = `
-                <div class="project-grid">
-                    ${allOutputs.map(output => `
-                        <div class="project-card">
-                            <div class="project-header">
-                                <div class="project-title">${output.name}</div>
-                                <span style="font-size: 12px; color: #666;">${output.type.toUpperCase()}</span>
-                            </div>
-                            <div class="project-meta">
-                                <strong>Project:</strong> ${output.project} | 
-                                <strong>Agent:</strong> ${output.agent}
-                            </div>
-                            <div style="margin: 15px 0;">${output.preview}</div>
-                            <div class="btn-group">
-                                <a href="${output.url}" target="_blank" class="btn btn-primary">Open ${output.type === 'preview' ? 'Live' : 'File'}</a>
-                                <button class="btn btn-info" onclick="previewOutputByUrl('${output.url}', '${output.name}', '${output.type}')">Preview</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+
+            container.innerHTML = '<div class="project-grid">' +
+                allOutputs.map(function(output) {
+                    return '<div class="project-card">' +
+                        '<div class="project-header">' +
+                        '<div class="project-title">' + output.name + '</div>' +
+                        '<span style="font-size: 12px; color: #666;">' + output.type.toUpperCase() + '</span>' +
+                        '</div>' +
+                        '<div class="project-meta"><strong>Project:</strong> ' + output.project + ' | <strong>Agent:</strong> ' + output.agent + '</div>' +
+                        '<div style="margin: 15px 0;">' + output.preview + '</div>' +
+                        '<div class="btn-group">' +
+                        '<a href="' + output.url + '" target="_blank" class="btn btn-primary">Open ' + (output.type === 'preview' ? 'Live' : 'File') + '</a>' +
+                        '<button class="btn btn-info" onclick="previewOutputByUrl(\'' + output.url + '\', \'' + output.name.replace(/'/g, "\\'") + '\', \'' + output.type + '\')">Preview</button>' +
+                        '</div>' +
+                        '</div>';
+                }).join('') +
+                '</div>';
         }
-        
-        // Render activity
+
+        // ============================================================
+        // RENDER ACTIVITY
+        // ============================================================
         function renderActivity() {
-            const container = document.getElementById('activity-log');
+            var container = document.getElementById('activity-log');
             if (!container) return;
-            
-            container.innerHTML = activity.map(item => `
-                <div class="activity-item">
-                    <div>${item.message}</div>
-                    <div class="activity-time">${item.time}</div>
-                </div>
-            `).join('');
+
+            container.innerHTML = activity.map(function(item) {
+                return '<div class="activity-item"><div>' + item.message + '</div><div class="activity-time">' + item.time + '</div></div>';
+            }).join('');
         }
-        
-        // Preview output
+
+        // ============================================================
+        // PREVIEW OUTPUT
+        // ============================================================
         function previewOutput(projectId, outputIndex) {
-            const project = projects.find(p => p.id === projectId);
-            const output = project.outputs[outputIndex];
+            var project = projects.find(function(p) { return p.id === projectId; });
+            if (!project) return;
+            var output = project.outputs[outputIndex];
+            if (!output) return;
             previewOutputByUrl(output.url, output.name, output.type);
         }
-        
+
         function previewOutputByUrl(url, title, type) {
-            const modal = document.getElementById('preview-modal');
-            const content = document.getElementById('preview-content');
-            const modalTitle = document.getElementById('preview-title');
-            
-            modalTitle.textContent = `Preview: ${title}`;
-            
+            var modal = document.getElementById('preview-modal');
+            var content = document.getElementById('preview-content');
+            var modalTitle = document.getElementById('preview-title');
+
+            modalTitle.textContent = 'Preview: ' + title;
+
             if (type === 'preview') {
-                content.innerHTML = `
-                    <h3>Live Preview: ${title}</h3>
-                    <p>Opening live preview in new tab...</p>
-                    <iframe class="preview-frame" src="${url}"></iframe>
-                    <div style="margin-top: 20px;">
-                        <a href="${url}" target="_blank" class="btn btn-primary">Open in New Tab</a>
-                        <button class="btn" onclick="closeModal()">Close</button>
-                    </div>
-                `;
+                content.innerHTML =
+                    '<h3>Live Preview: ' + title + '</h3>' +
+                    '<p>Opening live preview in new tab...</p>' +
+                    '<iframe class="preview-frame" src="' + url + '"></iframe>' +
+                    '<div style="margin-top: 20px;">' +
+                    '<a href="' + url + '" target="_blank" class="btn btn-primary">Open in New Tab</a> ' +
+                    '<button class="btn" onclick="closeModal()">Close</button>' +
+                    '</div>';
             } else {
-                content.innerHTML = `
-                    <h3>File Preview: ${title}</h3>
-                    <p>Loading file content...</p>
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; max-height: 400px; overflow-y: auto;">
-                        <pre id="file-content">Loading...</pre>
-                    </div>
-                    <div>
-                        <a href="${url}" target="_blank" class="btn btn-primary">Open Full File</a>
-                        <button class="btn" onclick="closeModal()">Close</button>
-                    </div>
-                `;
-                
-                // Fetch file content
+                content.innerHTML =
+                    '<h3>File Preview: ' + title + '</h3>' +
+                    '<p>Loading file content...</p>' +
+                    '<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; max-height: 400px; overflow-y: auto;">' +
+                    '<pre id="file-content">Loading...</pre></div>' +
+                    '<div>' +
+                    '<a href="' + url + '" target="_blank" class="btn btn-primary">Open Full File</a> ' +
+                    '<button class="btn" onclick="closeModal()">Close</button>' +
+                    '</div>';
+
                 fetch(url)
-                    .then(response => response.text())
-                    .then(text => {
-                        document.getElementById('file-content').textContent = text.substring(0, 5000) + (text.length > 5000 ? '\n\n... (truncated)' : '');
+                    .then(function(response) { return response.text(); })
+                    .then(function(text) {
+                        var el = document.getElementById('file-content');
+                        if (el) el.textContent = text.substring(0, 5000) + (text.length > 5000 ? '\n\n... (truncated)' : '');
                     })
-                    .catch(err => {
-                        document.getElementById('file-content').textContent = 'Error loading file: ' + err.message;
+                    .catch(function(err) {
+                        var el = document.getElementById('file-content');
+                        if (el) el.textContent = 'Error loading file: ' + err.message;
                     });
             }
-            
+
             modal.style.display = 'block';
         }
-        
-        // Project actions
+
+        // ============================================================
+        // PROJECT ACTIONS
+        // ============================================================
         function approveProject(id) {
-            const project = projects.find(p => p.id === id);
+            var project = projects.find(function(p) { return p.id === id; });
+            if (!project) return;
             project.status = 'approved';
             project.needsApproval = false;
-            addActivity(`✅ Project approved: "${project.title}"`);
-            alert(`Project "${project.title}" has been approved!`);
+            addActivity('✅ Project approved: "' + project.title + '"');
+            alert('Project "' + project.title + '" has been approved!');
             renderProjects();
             renderApprovalQueue();
         }
-        
+
         function requestChanges(id) {
-            const project = projects.find(p => p.id === id);
-            const changes = prompt(`What changes are needed for "${project.title}"?`);
+            var project = projects.find(function(p) { return p.id === id; });
+            if (!project) return;
+            var changes = prompt('What changes are needed for "' + project.title + '"?');
             if (changes) {
                 project.status = 'draft';
-                addActivity(`✏️ Changes requested for "${project.title}": ${changes}`);
-                alert(`Changes requested. Project returned to draft status.`);
+                addActivity('✏️ Changes requested for "' + project.title + '": ' + changes);
+                alert('Changes requested. Project returned to draft status.');
                 renderProjects();
                 renderApprovalQueue();
             }
         }
-        
+
         function rejectProject(id) {
-            const project = projects.find(p => p.id === id);
-            const reason = prompt(`Reason for rejecting "${project.title}"?`);
+            var project = projects.find(function(p) { return p.id === id; });
+            if (!project) return;
+            var reason = prompt('Reason for rejecting "' + project.title + '"?');
             if (reason) {
                 project.status = 'draft';
                 project.progress = 0;
-                addActivity(`❌ Project rejected: "${project.title}" - ${reason}`);
-                alert(`Project rejected and reset to draft.`);
+                addActivity('❌ Project rejected: "' + project.title + '" - ' + reason);
+                alert('Project rejected and reset to draft.');
                 renderProjects();
                 renderApprovalQueue();
             }
         }
-        
+
         function viewDetails(id) {
-            const project = projects.find(p => p.id === id);
-            const modal = document.getElementById('preview-modal');
-            const content = document.getElementById('preview-content');
-            const modalTitle = document.getElementById('preview-title');
-            
-            modalTitle.textContent = `Project Details: ${project.title}`;
-            
-            content.innerHTML = `
-                <h3>${project.title}</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                    <div>
-                        <strong>Agent:</strong> ${project.agent}<br>
-                        <strong>Status:</strong> ${project.status}<br>
-                        <strong>Progress:</strong> ${project.progress}%<br>
-                        <strong>Last Updated:</strong> ${project.lastUpdated}
-                    </div>
-                    <div>
-                        <strong>Description:</strong><br>
-                        ${project.description}
-                    </div>
-                </div>
-                
-                <h4>Outputs:</h4>
-                <ul>
-                    ${project.outputs.map(output => `
-                        <li>
-                            <strong>${output.name}</strong> (${output.type})<br>
-                            <a href="${output.url}" target="_blank">${output.url}</a><br>
-                            <em>${output.preview}</em>
-                        </li>
-                    `).join('')}
-                </ul>
-                
-                <div style="margin-top: 30px;">
-                    ${project.needsApproval ? `
-                        <button class="btn btn-success" onclick="approveProject(${id}); closeModal()">Approve</button>
-                        <button class="btn btn-warning" onclick="requestChanges(${id}); closeModal()">Request Changes</button>
-                        <button class="btn btn-danger" onclick="rejectProject(${id}); closeModal()">Reject</button>
-                    ` : ''}
-                    <button class="btn btn-primary" onclick="closeModal()">Close</button>
-                </div>
-            `;
-            
+            var project = projects.find(function(p) { return p.id === id; });
+            if (!project) return;
+            var modal = document.getElementById('preview-modal');
+            var content = document.getElementById('preview-content');
+            var modalTitle = document.getElementById('preview-title');
+
+            modalTitle.textContent = 'Project Details: ' + project.title;
+
+            var outputsDetail = project.outputs.map(function(output) {
+                return '<li><strong>' + output.name + '</strong> (' + output.type + ')<br>' +
+                    '<a href="' + output.url + '" target="_blank">' + output.url + '</a><br>' +
+                    '<em>' + output.preview + '</em></li>';
+            }).join('');
+
+            var approvalBtns = project.needsApproval
+                ? '<button class="btn btn-success" onclick="approveProject(' + id + '); closeModal()">Approve</button> ' +
+                  '<button class="btn btn-warning" onclick="requestChanges(' + id + '); closeModal()">Request Changes</button> ' +
+                  '<button class="btn btn-danger" onclick="rejectProject(' + id + '); closeModal()">Reject</button> '
+                : '';
+
+            content.innerHTML =
+                '<h3>' + project.title + '</h3>' +
+                '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">' +
+                '<div><strong>Agent:</strong> ' + project.agent + '<br>' +
+                '<strong>Status:</strong> ' + project.status + '<br>' +
+                '<strong>Progress:</strong> ' + project.progress + '%<br>' +
+                '<strong>Last Updated:</strong> ' + project.lastUpdated + '</div>' +
+                '<div><strong>Description:</strong><br>' + project.description + '</div>' +
+                '</div>' +
+                '<h4>Outputs:</h4><ul>' + outputsDetail + '</ul>' +
+                '<div style="margin-top: 30px;">' +
+                approvalBtns +
+                '<button class="btn btn-primary" onclick="closeModal()">Close</button>' +
+                '</div>';
+
             modal.style.display = 'block';
         }
-        
-        // Add activity
+
+        // ============================================================
+        // ACTIVITY LOGGING
+        // ============================================================
         function addActivity(message) {
             activity.unshift({
                 message: message,
@@ -574,25 +583,27 @@
             localStorage.setItem('bb-activity', JSON.stringify(activity));
             renderActivity();
         }
-        
+
         function closeModal() {
             document.getElementById('preview-modal').style.display = 'none';
         }
-        
-        // Initialize
+
+        // ============================================================
+        // INIT
+        // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
+            renderStats();
             renderProjects();
             renderActivity();
-            addActivity('Dashboard loaded with real project outputs');
+            addActivity('Dashboard loaded with updated project outputs');
         });
-        
-        // Close modal on outside click
+
         window.onclick = function(event) {
-            const modal = document.getElementById('preview-modal');
+            var modal = document.getElementById('preview-modal');
             if (event.target === modal) {
                 closeModal();
             }
-        }
+        };
     </script>
 </body>
 </html>
