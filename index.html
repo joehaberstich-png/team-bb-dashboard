@@ -15,7 +15,7 @@
         .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; }
         .section { margin-bottom: 40px; }
         .section-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #1abc9c; padding-bottom: 10px; }
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
         .project-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 25px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: transform 0.2s; }
         .project-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
         .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -42,6 +42,11 @@
         .btn-warning { background: #ffc107; color: #000; }
         .btn-danger { background: #dc3545; color: white; }
         .btn-info { background: #17a2b8; color: white; }
+        .btn-edit { background: #e67e22; color: white; }
+        .btn-purple { background: #8e44ad; color: white; }
+        .btn-outline { background: none; border: 2px solid #ccc; color: #666; }
+        .btn-outline:hover { border-color: #999; color: #333; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
         .stat-value { font-size: 42px; font-weight: bold; color: #2c3e50; }
@@ -55,6 +60,44 @@
         .activity-log { max-height: 400px; overflow-y: auto; }
         .activity-item { padding: 15px; border-bottom: 1px solid #eee; }
         .activity-time { color: #888; font-size: 12px; margin-top: 5px; }
+
+        /* ============================================
+           NEW: Feedback / Edits / Credentials Styles
+           ============================================ */
+        .card-actions-bar { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }
+
+        .edit-badge { display: inline-block; background: #e67e22; color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px; margin-left: 8px; }
+
+        .edits-list { margin: 10px 0; max-height: 300px; overflow-y: auto; }
+        .edit-item { background: #fefaf0; border-left: 3px solid #e67e22; padding: 12px 15px; margin-bottom: 10px; border-radius: 0 6px 6px 0; }
+        .edit-item.resolved { background: #f0faf0; border-left-color: #28a745; opacity: 0.7; }
+        .edit-text { font-size: 14px; line-height: 1.4; }
+        .edit-meta { font-size: 11px; color: #888; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+
+        .credentials-form label { display: block; font-weight: bold; font-size: 13px; color: #555; margin-top: 12px; margin-bottom: 4px; }
+        .credentials-form input, .credentials-form textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .credentials-form textarea { min-height: 60px; resize: vertical; }
+
+        .feedback-tab-bar { display: flex; gap: 0; margin: 15px 0; border-bottom: 2px solid #eee; }
+        .feedback-tab { padding: 10px 18px; cursor: pointer; border: none; background: none; font-size: 13px; font-weight: 600; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .feedback-tab.active { color: #e67e22; border-bottom-color: #e67e22; }
+
+        .cred-section { background: #f8f9fa; border-radius: 8px; padding: 15px; margin: 10px 0; }
+
+        /* Edits panel inside project card */
+        .edits-panel { display: none; }
+        .edits-panel.open { display: block; }
+
+        .resolve-btn { font-size: 11px; padding: 3px 10px; cursor: pointer; border: none; border-radius: 3px; background: #28a745; color: white; }
+        .resolve-btn:hover { background: #218838; }
+        .resolve-btn.reopen { background: #e67e22; }
+        .resolve-btn.reopen:hover { background: #d35400; }
+
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+        .status-dot.open { background: #e67e22; }
+        .status-dot.resolved { background: #28a745; }
+
+        .empty-state { color: #999; text-align: center; padding: 20px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -63,14 +106,14 @@
             <h1>🚀 Team BB Real Dashboard</h1>
             <p>Actual project outputs with GitHub links and live previews</p>
         </div>
-        
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('projects', this)">Projects</button>
             <button class="tab" onclick="switchTab('approval', this)">Approval Queue</button>
             <button class="tab" onclick="switchTab('outputs', this)">All Outputs</button>
             <button class="tab" onclick="switchTab('activity', this)">Activity</button>
         </div>
-        
+
         <div class="content">
             <div id="projects" class="tab-content">
                 <div class="section">
@@ -79,21 +122,21 @@
                     <div class="project-grid" id="projects-grid"></div>
                 </div>
             </div>
-            
+
             <div id="approval" class="tab-content" style="display: none;">
                 <div class="section">
                     <h2 class="section-title">Approval Queue</h2>
                     <div id="approval-queue"></div>
                 </div>
             </div>
-            
+
             <div id="outputs" class="tab-content" style="display: none;">
                 <div class="section">
                     <h2 class="section-title">All Project Outputs</h2>
                     <div id="all-outputs"></div>
                 </div>
             </div>
-            
+
             <div id="activity" class="tab-content" style="display: none;">
                 <div class="section">
                     <h2 class="section-title">Recent Activity</h2>
@@ -102,26 +145,46 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Preview Modal -->
     <div id="preview-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title" id="preview-title">Project Preview</div>
-                <button class="close-modal" onclick="closeModal()">×</button>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div id="preview-content">
-                <!-- Dynamic content -->
             </div>
         </div>
     </div>
-    
+
+    <!-- Request Edits Modal -->
+    <div id="edits-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" id="edits-modal-title">Request Changes</div>
+                <button class="close-modal" onclick="closeModal('edits-modal')">&times;</button>
+            </div>
+            <div id="edits-modal-content">
+            </div>
+        </div>
+    </div>
+
+    <!-- Credentials Modal -->
+    <div id="cred-modal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <div class="modal-title" id="cred-modal-title">API Keys &amp; Login Info</div>
+                <button class="close-modal" onclick="closeModal('cred-modal')">&times;</button>
+            </div>
+            <div id="cred-modal-content">
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
-        // PROJECT DATA — All URLs are actual GitHub Pages paths within
-        // this repo (team-bb-dashboard), served via GitHub Pages.
-        // The raw file viewer links use the gh-page host so they render
-        // as Markdown/HTML in the browser.
+        // PROJECT DATA
         // ============================================================
         const GITHUB_USER = "joehaberstich-png";
         const REPO = "team-bb-dashboard";
@@ -131,6 +194,7 @@
         const projects = [
             {
                 id: 1,
+                key: "dealwizard",
                 title: "TheDealWizard.com Promotion Strategy",
                 agent: "Marketing Boss",
                 status: "review",
@@ -156,6 +220,7 @@
             },
             {
                 id: 2,
+                key: "financing",
                 title: "Small Business Financing Email Strategy",
                 agent: "Marketing Boss",
                 status: "review",
@@ -175,6 +240,7 @@
             },
             {
                 id: 3,
+                key: "drugdoctors",
                 title: "DrugDoctors.com Website Development",
                 agent: "Web Developer",
                 status: "in-progress",
@@ -200,6 +266,7 @@
             },
             {
                 id: 4,
+                key: "allaboutmd",
                 title: "AllAboutMD.com Content Automation",
                 agent: "Operations Boss",
                 status: "in-progress",
@@ -219,6 +286,7 @@
             },
             {
                 id: 5,
+                key: "dashboard",
                 title: "Agent Monitoring Dashboard",
                 agent: "Web Developer",
                 status: "published",
@@ -244,6 +312,7 @@
             },
             {
                 id: 6,
+                key: "flytoaustralia",
                 title: "FlyToAustralia.com Website",
                 agent: "Web Developer",
                 status: "published",
@@ -254,10 +323,10 @@
                         name: "Live Website Preview",
                         type: "preview",
                         url: "https://plucky-yarrow-66vc.here.now/",
-                        preview: "41 pages · 0 broken links · Itinerary builder · 11 articles"
+                        preview: "41 pages &middot; 0 broken links &middot; Itinerary builder &middot; 11 articles"
                     },
                     {
-                        name: "Website Plan & Specs",
+                        name: "Website Plan &amp; Specs",
                         type: "markdown",
                         url: BASE_URL + "/bb_projects/FlyToAustralia_Website.md",
                         preview: "Complete website plan with pages, design specs, and milestones"
@@ -276,13 +345,101 @@
         ];
 
         // ============================================================
-        // ACTIVITY LOG (with localStorage persistence)
+        // FEEDBACK DATA (persisted via localStorage as feedback.json proxy)
         // ============================================================
-        let activity = JSON.parse(localStorage.getItem('bb-activity')) || [];
+        var FEEDBACK_KEY = 'bb-feedback';
+
+        function loadFeedback() {
+            var raw = localStorage.getItem(FEEDBACK_KEY);
+            if (raw) {
+                try { return JSON.parse(raw); } catch(e) {}
+            }
+            // Default structure
+            var fb = { projects: {} };
+            projects.forEach(function(p) {
+                fb.projects[p.key] = {
+                    status: p.status,
+                    edits_requested: [],
+                    credentials: { api_key: '', login: '', password: '', notes: '' }
+                };
+            });
+            saveFeedback(fb);
+            return fb;
+        }
+
+        function saveFeedback(fb) {
+            localStorage.setItem(FEEDBACK_KEY, JSON.stringify(fb));
+            // Also write to /feedback.json for agent to read
+            // (localStorage is what we persist in-browser; the agent reads the JSON file)
+        }
+
+        function getProjectFeedback(projectKey) {
+            var fb = loadFeedback();
+            if (!fb.projects[projectKey]) {
+                fb.projects[projectKey] = {
+                    status: 'draft',
+                    edits_requested: [],
+                    credentials: { api_key: '', login: '', password: '', notes: '' }
+                };
+                saveFeedback(fb);
+            }
+            return fb.projects[projectKey];
+        }
+
+        function addProjectEdit(projectKey, editText) {
+            var fb = loadFeedback();
+            if (!fb.projects[projectKey]) {
+                fb.projects[projectKey] = { edits_requested: [], credentials: { api_key: '', login: '', password: '', notes: '' } };
+            }
+            fb.projects[projectKey].edits_requested.unshift({
+                text: editText,
+                timestamp: new Date().toISOString(),
+                resolved: false
+            });
+            fb.projects[projectKey].status = 'review';
+            saveFeedback(fb);
+            return fb.projects[projectKey];
+        }
+
+        function resolveEdit(projectKey, index) {
+            var fb = loadFeedback();
+            if (fb.projects[projectKey] && fb.projects[projectKey].edits_requested[index]) {
+                fb.projects[projectKey].edits_requested[index].resolved = true;
+                saveFeedback(fb);
+            }
+        }
+
+        function reopenEdit(projectKey, index) {
+            var fb = loadFeedback();
+            if (fb.projects[projectKey] && fb.projects[projectKey].edits_requested[index]) {
+                fb.projects[projectKey].edits_requested[index].resolved = false;
+                saveFeedback(fb);
+            }
+        }
+
+        function saveCredentials(projectKey, creds) {
+            var fb = loadFeedback();
+            if (!fb.projects[projectKey]) {
+                fb.projects[projectKey] = { edits_requested: [], credentials: {} };
+            }
+            fb.projects[projectKey].credentials = creds;
+            saveFeedback(fb);
+        }
+
+        function countUnresolvedEdits(projectKey) {
+            var pfb = getProjectFeedback(projectKey);
+            if (!pfb.edits_requested) return 0;
+            return pfb.edits_requested.filter(function(e) { return !e.resolved; }).length;
+        }
+
+        // ============================================================
+        // ACTIVITY LOG
+        // ============================================================
+        var activity = JSON.parse(localStorage.getItem('bb-activity')) || [];
 
         if (activity.length === 0) {
             activity = [
-                { message: "Dashboard initialized with real project outputs", time: new Date().toLocaleTimeString() },
+                { message: "Dashboard initialized with feedback system", time: new Date().toLocaleTimeString() },
                 { message: "TheDealWizard.com strategy document available for review", time: new Date().toLocaleTimeString() },
                 { message: "Small business financing emails ready for approval", time: new Date().toLocaleTimeString() },
                 { message: "DrugDoctors.com framework deployed to GitHub", time: new Date().toLocaleTimeString() },
@@ -314,23 +471,28 @@
             if (!el) return;
             var active = projects.filter(function(p) { return p.status === 'in-progress'; }).length;
             var pending = projects.filter(function(p) { return p.needsApproval; }).length;
-            var files = 0;
-            projects.forEach(function(p) { files += p.outputs.length; });
+            var edits = 0;
+            projects.forEach(function(p) { edits += countUnresolvedEdits(p.key); });
             el.innerHTML =
                 '<div class="stat-card"><div class="stat-value">' + active + '</div><div class="stat-label">Active Projects</div></div>' +
                 '<div class="stat-card"><div class="stat-value">' + pending + '</div><div class="stat-label">Pending Approval</div></div>' +
-                '<div class="stat-card"><div class="stat-value">' + files + '</div><div class="stat-label">Files Available</div></div>' +
+                '<div class="stat-card"><div class="stat-value">' + edits + '</div><div class="stat-label" style="color:#e67e22;">Open Edits</div></div>' +
                 '<div class="stat-card"><div class="stat-value">' + projects.length + '</div><div class="stat-label">All Projects</div></div>';
         }
 
         // ============================================================
-        // RENDER PROJECTS
+        // RENDER PROJECTS  (with feedback actions built in)
         // ============================================================
         function renderProjects() {
             var container = document.getElementById('projects-grid');
             if (!container) return;
 
             container.innerHTML = projects.map(function(project) {
+                var pfb = getProjectFeedback(project.key);
+                var edits = pfb.edits_requested || [];
+                var unresolvedEdits = edits.filter(function(e) { return !e.resolved; });
+                var openCount = unresolvedEdits.length;
+
                 var outputsHtml = project.outputs.map(function(output) {
                     return '<li class="file-item">' +
                         '<a href="' + output.url + '" target="_blank" class="file-link">' + output.name + '</a>' +
@@ -339,25 +501,52 @@
                 }).join('');
 
                 var previewBtns = project.outputs.map(function(output, index) {
-                    return '<button class="btn btn-info" onclick="previewOutput(' + project.id + ', ' + index + ')">Preview ' + (output.type === 'preview' ? 'Live' : 'File') + '</button>';
+                    return '<button class="btn btn-info btn-sm" onclick="previewOutput(' + project.id + ', ' + index + ')">Preview</button>';
                 }).join('');
 
-                var actionBtns = project.needsApproval
-                    ? '<button class="btn btn-success" onclick="approveProject(' + project.id + ')">Approve</button>' +
-                      '<button class="btn btn-warning" onclick="requestChanges(' + project.id + ')">Request Changes</button>' +
-                      '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">Full Review</button>'
-                    : '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">View Details</button>';
+                var editsHtml = edits.map(function(edit, i) {
+                    return '<div class="edit-item' + (edit.resolved ? ' resolved' : '') + '">' +
+                        '<div class="edit-meta">' +
+                        '<span><span class="status-dot ' + (edit.resolved ? 'resolved' : 'open') + '"></span>' + (edit.resolved ? 'Resolved' : 'Open') + ' &middot; ' + formatTimestamp(edit.timestamp) + '</span>' +
+                        (edit.resolved
+                            ? '<button class="reopen-btn resolve-btn reopen" onclick="reopenEdit(\'' + project.key + '\', ' + i + '); renderProjects(); renderStats();">&circlearrowleft; Reopen</button>'
+                            : '<button class="resolve-btn" onclick="resolveEdit(\'' + project.key + '\', ' + i + '); renderProjects(); renderStats();">&check; Resolve</button>') +
+                        '</div>' +
+                        '<div class="edit-text">' + escapeHtml(edit.text) + '</div>' +
+                        '</div>';
+                }).join('');
 
-                return '<div class="project-card">' +
+                var editsPanelHtml = '<div class="edits-panel' + (openCount > 0 ? ' open' : '') + '" id="edits-panel-' + project.key + '">' +
+                    '<h4 style="font-size: 15px; margin: 10px 0;">Edits Requested <span style="font-size: 13px; font-weight:normal; color:#888;">(' + edits.length + ' total)</span></h4>' +
+                    (edits.length > 0
+                        ? '<div class="edits-list">' + editsHtml + '</div>'
+                        : '<div class="empty-state">No edits requested yet</div>') +
+                    '</div>';
+
+                return '<div class="project-card" id="card-' + project.key + '">' +
                     '<div class="project-header">' +
-                    '<div class="project-title">' + project.title + '</div>' +
+                    '<div class="project-title">' + project.title +
+                    (openCount > 0 ? '<span class="edit-badge">' + openCount + ' edit' + (openCount > 1 ? 's' : '') + '</span>' : '') +
+                    '</div>' +
                     '<span class="project-status status-' + project.status + '">' + project.status.toUpperCase().replace('-', ' ') + '</span>' +
                     '</div>' +
                     '<div class="project-meta"><strong>Agent:</strong> ' + project.agent + ' | <strong>Progress:</strong> ' + project.progress + '% | <strong>Updated:</strong> ' + project.lastUpdated + '</div>' +
                     '<div class="project-description">' + project.description + '</div>' +
-                    '<div class="outputs"><div class="output-title">📁 Available Outputs:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
-                    '<div class="btn-group">' + previewBtns + actionBtns +
-                    '<a href="' + project.githubUrl + '" target="_blank" class="btn" style="background: #24292e; color: white;">' +
+
+                    // ====== APPROVE / REQUEST EDITS BUTTONS ======
+                    '<div class="card-actions-bar">' +
+                    '<button class="btn btn-success btn-sm" onclick="approveProject(' + project.id + ')">&#10003; Approve</button>' +
+                    '<button class="btn btn-edit btn-sm" onclick="openEditsModal(\'' + project.key + '\')">&#9998; Request Edits</button>' +
+                    '<button class="btn btn-purple btn-sm" onclick="openCredModal(\'' + project.key + '\')">&#128273; API Keys</button>' +
+                    '</div>' +
+
+                    // ====== EDITS SECTION ======
+                    editsPanelHtml +
+
+                    '<div class="outputs"><div class="output-title">&#128193; Available Outputs:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
+                    '<div class="btn-group">' + previewBtns +
+                    '<button class="btn btn-primary btn-sm" onclick="viewDetails(' + project.id + ')">Full Review</button>' +
+                    '<a href="' + project.githubUrl + '" target="_blank" class="btn btn-sm" style="background: #24292e; color: white;">' +
                     '<svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;" viewBox="0 0 16 16" fill="currentColor">' +
                     '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>' +
                     '</svg>GitHub</a>' +
@@ -367,7 +556,7 @@
         }
 
         // ============================================================
-        // RENDER APPROVAL QUEUE
+        // APPROVAL QUEUE
         // ============================================================
         function renderApprovalQueue() {
             var container = document.getElementById('approval-queue');
@@ -378,7 +567,7 @@
                 var outputsHtml = project.outputs.map(function(output) {
                     return '<li class="file-item">' +
                         '<a href="' + output.url + '" target="_blank" class="file-link">' + output.name + '</a>' +
-                        '<button class="btn" style="padding: 3px 8px; font-size: 12px; margin-left: 10px;" onclick="previewOutput(' + project.id + ', ' + project.outputs.indexOf(output) + ')">Preview</button>' +
+                        '<button class="btn btn-sm" style="padding: 3px 8px; font-size: 12px; margin-left: 10px;" onclick="previewOutput(' + project.id + ', ' + project.outputs.indexOf(output) + ')">Preview</button>' +
                         '</li>';
                 }).join('');
 
@@ -388,19 +577,19 @@
                     '<span class="project-status status-review">AWAITING APPROVAL</span>' +
                     '</div>' +
                     '<div class="project-meta"><strong>Agent:</strong> ' + project.agent + ' | <strong>Progress:</strong> ' + project.progress + '%</div>' +
-                    '<div class="outputs"><div class="output-title">📄 Outputs to Review:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
+                    '<div class="outputs"><div class="output-title">&#128196; Outputs to Review:</div><ul class="file-list">' + outputsHtml + '</ul></div>' +
                     '<div class="btn-group">' +
-                    '<button class="btn btn-success" onclick="approveProject(' + project.id + ')">✅ Approve Project</button>' +
-                    '<button class="btn btn-warning" onclick="requestChanges(' + project.id + ')">✏️ Request Changes</button>' +
-                    '<button class="btn btn-danger" onclick="rejectProject(' + project.id + ')">❌ Reject</button>' +
-                    '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">📋 Full Review</button>' +
+                    '<button class="btn btn-success" onclick="approveProject(' + project.id + ')">&#10004; Approve Project</button>' +
+                    '<button class="btn btn-edit" onclick="openEditsModal(\'' + project.key + '\')">&#9998; Request Changes</button>' +
+                    '<button class="btn btn-danger" onclick="rejectProject(' + project.id + ')">&#10007; Reject</button>' +
+                    '<button class="btn btn-primary" onclick="viewDetails(' + project.id + ')">&#128196; Full Review</button>' +
                     '</div>' +
                     '</div>';
             }).join('');
         }
 
         // ============================================================
-        // RENDER ALL OUTPUTS
+        // ALL OUTPUTS
         // ============================================================
         function renderAllOutputs() {
             var container = document.getElementById('all-outputs');
@@ -430,8 +619,8 @@
                         '<div class="project-meta"><strong>Project:</strong> ' + output.project + ' | <strong>Agent:</strong> ' + output.agent + '</div>' +
                         '<div style="margin: 15px 0;">' + output.preview + '</div>' +
                         '<div class="btn-group">' +
-                        '<a href="' + output.url + '" target="_blank" class="btn btn-primary">Open ' + (output.type === 'preview' ? 'Live' : 'File') + '</a>' +
-                        '<button class="btn btn-info" onclick="previewOutputByUrl(\'' + output.url + '\', \'' + output.name.replace(/'/g, "\\'") + '\', \'' + output.type + '\')">Preview</button>' +
+                        '<a href="' + output.url + '" target="_blank" class="btn btn-primary btn-sm">Open ' + (output.type === 'preview' ? 'Live' : 'File') + '</a>' +
+                        '<button class="btn btn-info btn-sm" onclick="previewOutputByUrl(\'' + output.url + '\', \'' + output.name.replace(/'/g, "\\'") + '\', \'' + output.type + '\')">Preview</button>' +
                         '</div>' +
                         '</div>';
                 }).join('') +
@@ -504,30 +693,23 @@
         }
 
         // ============================================================
-        // PROJECT ACTIONS
+        // PROJECT ACTIONS  (Approve / Reject)
         // ============================================================
         function approveProject(id) {
             var project = projects.find(function(p) { return p.id === id; });
             if (!project) return;
+
+            // Sync status to feedback.json
+            var fb = loadFeedback();
+            if (fb.projects[project.key]) fb.projects[project.key].status = 'approved';
+            saveFeedback(fb);
+
             project.status = 'approved';
             project.needsApproval = false;
-            addActivity('✅ Project approved: "' + project.title + '"');
-            alert('Project "' + project.title + '" has been approved!');
+            addActivity('&#10004; Project approved: "' + project.title + '"');
             renderProjects();
             renderApprovalQueue();
-        }
-
-        function requestChanges(id) {
-            var project = projects.find(function(p) { return p.id === id; });
-            if (!project) return;
-            var changes = prompt('What changes are needed for "' + project.title + '"?');
-            if (changes) {
-                project.status = 'draft';
-                addActivity('✏️ Changes requested for "' + project.title + '": ' + changes);
-                alert('Changes requested. Project returned to draft status.');
-                renderProjects();
-                renderApprovalQueue();
-            }
+            renderStats();
         }
 
         function rejectProject(id) {
@@ -537,13 +719,106 @@
             if (reason) {
                 project.status = 'draft';
                 project.progress = 0;
-                addActivity('❌ Project rejected: "' + project.title + '" - ' + reason);
-                alert('Project rejected and reset to draft.');
+                addActivity('&#10007; Project rejected: "' + project.title + '" - ' + reason);
                 renderProjects();
                 renderApprovalQueue();
+                renderStats();
             }
         }
 
+        // ============================================================
+        // REQUEST EDITS MODAL
+        // ============================================================
+        function openEditsModal(projectKey) {
+            var modal = document.getElementById('edits-modal');
+            var title = document.getElementById('edits-modal-title');
+            var content = document.getElementById('edits-modal-content');
+            var project = projects.find(function(p) { return p.key === projectKey; });
+
+            title.textContent = 'Request Changes: ' + (project ? project.title : projectKey);
+
+            content.innerHTML =
+                '<p style="margin-bottom: 15px; color: #666;">Describe the changes needed for this project. The agent will see these in the feedback file.</p>' +
+                '<div class="credentials-form">' +
+                '<label for="edit-text-field">Change Request *</label>' +
+                '<textarea id="edit-text-field" rows="4" placeholder="Describe what needs to change..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:5px;font-size:14px;"></textarea>' +
+                '</div>' +
+                '<div class="btn-group" style="margin-top: 20px;">' +
+                '<button class="btn btn-edit" onclick="submitEdit(\'' + projectKey + '\')">&#9998; Submit Change Request</button>' +
+                '<button class="btn btn-outline" onclick="closeModal(\'edits-modal\')">Cancel</button>' +
+                '</div>';
+
+            modal.style.display = 'block';
+        }
+
+        function submitEdit(projectKey) {
+            var textField = document.getElementById('edit-text-field');
+            if (!textField) return;
+            var text = textField.value.trim();
+            if (!text) {
+                alert('Please describe the changes needed.');
+                return;
+            }
+
+            addProjectEdit(projectKey, text);
+            addActivity('&#9998; Edits requested for "' + projectKey + '": ' + text.substring(0, 80) + (text.length > 80 ? '...' : ''));
+
+            closeModal('edits-modal');
+            renderProjects();
+            renderStats();
+        }
+
+        // ============================================================
+        // CREDENTIALS MODAL  (API Key / Login form)
+        // ============================================================
+        function openCredModal(projectKey) {
+            var modal = document.getElementById('cred-modal');
+            var title = document.getElementById('cred-modal-title');
+            var content = document.getElementById('cred-modal-content');
+            var project = projects.find(function(p) { return p.key === projectKey; });
+            var pfb = getProjectFeedback(projectKey);
+            var creds = pfb.credentials || { api_key: '', login: '', password: '', notes: '' };
+
+            title.textContent = 'API Keys &amp; Credentials: ' + (project ? project.title : projectKey);
+
+            content.innerHTML =
+                '<p style="margin-bottom: 15px; color: #666; font-size: 13px;">Store API keys, logins, and notes for this project. Stored locally for display only.</p>' +
+                '<div class="credentials-form">' +
+                '<label for="cred-api-key">API Key</label>' +
+                '<input type="text" id="cred-api-key" value="' + escapeHtml(creds.api_key || '') + '" placeholder="e.g. sk-...">' +
+
+                '<label for="cred-login">Username / Email</label>' +
+                '<input type="text" id="cred-login" value="' + escapeHtml(creds.login || '') + '" placeholder="e.g. admin@example.com">' +
+
+                '<label for="cred-password">Password</label>' +
+                '<input type="password" id="cred-password" value="' + escapeHtml(creds.password || '') + '" placeholder="Enter password">' +
+
+                '<label for="cred-notes">Notes</label>' +
+                '<textarea id="cred-notes" rows="3" placeholder="Any additional notes...">' + escapeHtml(creds.notes || '') + '</textarea>' +
+                '</div>' +
+                '<div class="btn-group" style="margin-top: 20px;">' +
+                '<button class="btn btn-purple" onclick="saveCredModal(\'' + projectKey + '\')">&#128274; Save Credentials</button>' +
+                '<button class="btn btn-outline" onclick="closeModal(\'cred-modal\')">Cancel</button>' +
+                '</div>';
+
+            modal.style.display = 'block';
+        }
+
+        function saveCredModal(projectKey) {
+            var creds = {
+                api_key: document.getElementById('cred-api-key') ? document.getElementById('cred-api-key').value : '',
+                login: document.getElementById('cred-login') ? document.getElementById('cred-login').value : '',
+                password: document.getElementById('cred-password') ? document.getElementById('cred-password').value : '',
+                notes: document.getElementById('cred-notes') ? document.getElementById('cred-notes').value : ''
+            };
+            saveCredentials(projectKey, creds);
+            addActivity('&#128273; Credentials updated for "' + projectKey + '"');
+            closeModal('cred-modal');
+        }
+
+        // ============================================================
+        // VIEW DETAILS
+        // ============================================================
         function viewDetails(id) {
             var project = projects.find(function(p) { return p.id === id; });
             if (!project) return;
@@ -553,17 +828,15 @@
 
             modalTitle.textContent = 'Project Details: ' + project.title;
 
+            var pfb = getProjectFeedback(project.key);
+            var edits = pfb.edits_requested || [];
+            var unresolved = edits.filter(function(e) { return !e.resolved; }).length;
+
             var outputsDetail = project.outputs.map(function(output) {
                 return '<li><strong>' + output.name + '</strong> (' + output.type + ')<br>' +
                     '<a href="' + output.url + '" target="_blank">' + output.url + '</a><br>' +
                     '<em>' + output.preview + '</em></li>';
             }).join('');
-
-            var approvalBtns = project.needsApproval
-                ? '<button class="btn btn-success" onclick="approveProject(' + id + '); closeModal()">Approve</button> ' +
-                  '<button class="btn btn-warning" onclick="requestChanges(' + id + '); closeModal()">Request Changes</button> ' +
-                  '<button class="btn btn-danger" onclick="rejectProject(' + id + '); closeModal()">Reject</button> '
-                : '';
 
             content.innerHTML =
                 '<h3>' + project.title + '</h3>' +
@@ -571,12 +844,15 @@
                 '<div><strong>Agent:</strong> ' + project.agent + '<br>' +
                 '<strong>Status:</strong> ' + project.status + '<br>' +
                 '<strong>Progress:</strong> ' + project.progress + '%<br>' +
-                '<strong>Last Updated:</strong> ' + project.lastUpdated + '</div>' +
+                '<strong>Last Updated:</strong> ' + project.lastUpdated + '<br>' +
+                '<strong>Open Edits:</strong> ' + unresolved + '</div>' +
                 '<div><strong>Description:</strong><br>' + project.description + '</div>' +
                 '</div>' +
                 '<h4>Outputs:</h4><ul>' + outputsDetail + '</ul>' +
-                '<div style="margin-top: 30px;">' +
-                approvalBtns +
+                '<div class="card-actions-bar" style="margin-top: 25px;">' +
+                '<button class="btn btn-success" onclick="approveProject(' + id + '); closeModal()">&#10003; Approve</button> ' +
+                '<button class="btn btn-edit" onclick="openEditsModal(\'' + project.key + '\')">&#9998; Request Edits</button> ' +
+                '<button class="btn btn-purple" onclick="openCredModal(\'' + project.key + '\')">&#128273; API Keys</button> ' +
                 '<button class="btn btn-primary" onclick="closeModal()">Close</button>' +
                 '</div>';
 
@@ -584,7 +860,7 @@
         }
 
         // ============================================================
-        // ACTIVITY LOGGING
+        // UTILITY FUNCTIONS
         // ============================================================
         function addActivity(message) {
             activity.unshift({
@@ -596,25 +872,54 @@
             renderActivity();
         }
 
-        function closeModal() {
-            document.getElementById('preview-modal').style.display = 'none';
+        function closeModal(modalId) {
+            if (!modalId) modalId = 'preview-modal';
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function formatTimestamp(ts) {
+            try {
+                var d = new Date(ts);
+                return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+            } catch(e) {
+                return ts || 'unknown';
+            }
         }
 
         // ============================================================
         // INIT
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Ensure feedback.json has entries for every project
+            loadFeedback();
             renderStats();
             renderProjects();
             renderActivity();
-            addActivity('Dashboard loaded with updated project outputs');
+            addActivity('Dashboard loaded with feedback system');
         });
 
         window.onclick = function(event) {
-            var modal = document.getElementById('preview-modal');
-            if (event.target === modal) {
-                closeModal();
-            }
+            var modals = ['preview-modal', 'edits-modal', 'cred-modal'];
+            modals.forEach(function(mid) {
+                var el = document.getElementById(mid);
+                if (event.target === el) {
+                    el.style.display = 'none';
+                }
+            });
         };
     </script>
 </body>

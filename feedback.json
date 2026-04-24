@@ -1,0 +1,58 @@
+{
+  "projects": {
+    "dealwizard": {
+      "status": "review",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    },
+    "financing": {
+      "status": "review",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    },
+    "drugdoctors": {
+      "status": "in-progress",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    },
+    "allaboutmd": {
+      "status": "in-progress",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    },
+    "dashboard": {
+      "status": "published",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    },
+    "flytoaustralia": {
+      "status": "published",
+      "edits_requested": [],
+      "credentials": {
+        "api_key": "",
+        "login": "",
+        "notes": ""
+      }
+    }
+  }
+}
