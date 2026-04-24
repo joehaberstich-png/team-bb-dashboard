@@ -118,6 +118,42 @@ function initializeTooltips() {
     });
 }
 
+// Contact form handler
+const contactForm = document.querySelector('.contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const subject = document.getElementById('subject');
+        const message = document.getElementById('message');
+        
+        // Simple validation
+        if (!name.value || !email.value || !message.value) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        if (!email.value.includes('@') || !email.value.includes('.')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+        
+        // Show success message (in real production, this would send the form)
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+        submitBtn.style.backgroundColor = '#34a853';
+        
+        setTimeout(function() {
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.backgroundColor = '';
+            contactForm.reset();
+        }, 3000);
+    });
+}
+
 // Responsive adjustments
 window.addEventListener('resize', function() {
     const navLinks = document.querySelector('.nav-links');
