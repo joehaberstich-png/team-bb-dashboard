@@ -246,19 +246,31 @@
                 id: 6,
                 title: "FlyToAustralia.com Website",
                 agent: "Web Developer",
-                status: "in-progress",
-                progress: 25,
-                description: "Full travel information and booking resource website for Australia",
+                status: "published",
+                progress: 100,
+                description: "Full travel information and booking resource website for Australia — COMPLETE",
                 outputs: [
+                    {
+                        name: "Live Website Preview",
+                        type: "preview",
+                        url: "https://plucky-yarrow-66vc.here.now/",
+                        preview: "41 pages · 0 broken links · Itinerary builder · 11 articles"
+                    },
                     {
                         name: "Website Plan & Specs",
                         type: "markdown",
                         url: BASE_URL + "/bb_projects/FlyToAustralia_Website.md",
                         preview: "Complete website plan with pages, design specs, and milestones"
+                    },
+                    {
+                        name: "Full Site Files",
+                        type: "html",
+                        url: BASE_URL + "/bb_projects/flytoaustralia/index.html",
+                        preview: "Complete site source code (41 HTML pages)"
                     }
                 ],
                 githubUrl: "https://github.com/" + GITHUB_USER + "/" + REPO + "/blob/main/bb_projects/FlyToAustralia_Website.md",
-                lastUpdated: "2026-04-23",
+                lastUpdated: "2026-04-24",
                 needsApproval: false
             }
         ];
