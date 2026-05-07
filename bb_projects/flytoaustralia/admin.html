@@ -71,6 +71,7 @@
             <div class="admin-tabs">
                 <button class="admin-tab active" onclick="switchTab('affiliates', this)"><i class="fas fa-link"></i> Affiliate Links</button>
                 <button class="admin-tab" onclick="switchTab('pages', this)"><i class="fas fa-file-alt"></i> Page Meta</button>
+                <button class="admin-tab" onclick="switchTab('blog', this)"><i class="fas fa-newspaper"></i> Blog Articles</button>
                 <button class="admin-tab" onclick="switchTab('settings', this)"><i class="fas fa-wrench"></i> Settings</button>
                 <button class="admin-tab" onclick="switchTab('guide', this)"><i class="fas fa-book"></i> Buyer Guide</button>
             </div>
@@ -90,6 +91,36 @@
                 <h3><i class="fas fa-file-alt"></i> Page Metadata</h3>
                 <p class="section-desc">Edit meta titles and descriptions for SEO. Dark-bordered = main pages.</p>
                 <div id="pages-list" class="meta-grid"></div>
+            </div>
+
+            <!-- Blog Articles Tab -->
+            <div id="tab-blog" class="admin-card" style="display:none;">
+                <h3><i class="fas fa-newspaper"></i> Blog Articles</h3>
+                <p class="section-desc">Create and manage blog articles. Saved articles exist in the admin panel — copy the HTML to a new file when ready to publish.</p>
+                
+                <div style="margin-bottom:25px;padding:20px;background:#f8f9fa;border-radius:8px;">
+                    <h4 style="margin:0 0 15px 0;">New Article</h4>
+                    <div style="display:grid;gap:12px;">
+                        <input type="text" id="blog-title" placeholder="Article Title" style="padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;">
+                        <input type="text" id="blog-slug" placeholder="URL slug (e.g. sydney-guide)" style="padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;">
+                        <select id="blog-category" style="padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;">
+                            <option value="destinations">Destinations</option>
+                            <option value="visa">Visa</option>
+                            <option value="budget">Budget &amp; Planning</option>
+                            <option value="seasonal">Seasonal</option>
+                        </select>
+                        <input type="text" id="blog-image" placeholder="Hero image URL (optional)" style="padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;">
+                        <textarea id="blog-content" rows="16" placeholder="Article content in HTML format. Use &lt;h2&gt; for headings, &lt;p&gt; for paragraphs." style="padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;font-family:monospace;"></textarea>
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="saveBlogDraft()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;"><i class="fas fa-save"></i> Save Draft</button>
+                            <button onclick="exportBlogHTML()" style="background:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;"><i class="fas fa-code"></i> Export HTML</button>
+                            <button onclick="clearBlogForm()" style="background:#95a5a6;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;"><i class="fas fa-times"></i> Clear</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 style="margin:0 0 10px 0;">Saved Drafts</h4>
+                <div id="blog-drafts"></div>
             </div>
 
             <!-- Settings Tab -->
@@ -125,6 +156,7 @@
         const STORAGE_KEY = 'flytoaustralia_admin';
         const AFFILIATES_KEY = 'flytoaustralia_affiliates';
         const META_KEY = 'flytoaustralia_meta';
+        const BLOG_KEY = 'flytoaustralia_blog';
 
         const DEFAULT_AFFILIATES = [
             { id: 'skyscanner', label: 'Flights (Skyscanner)', url: 'https://www.skyscanner.com' },
@@ -395,6 +427,173 @@
             renderAffiliates();
             renderPages();
             renderBuyerGuide();
+            renderBlogDrafts();
+        }
+
+        // ==============================
+        // BLOG ARTICLES
+        // ==============================
+        function getBlogDrafts() {
+            try { return JSON.parse(localStorage.getItem(BLOG_KEY)) || []; }
+            catch(e) { return []; }
+        }
+
+        function saveBlogDraft() {
+            var title = document.getElementById('blog-title').value.trim();
+            var slug = document.getElementById('blog-slug').value.trim();
+            var category = document.getElementById('blog-category').value;
+            var image = document.getElementById('blog-image').value.trim();
+            var content = document.getElementById('blog-content').value.trim();
+
+            if (!title || !content) { alert('Title and content are required.'); return; }
+            if (!slug) { slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+
+            var drafts = getBlogDrafts();
+            var existing = drafts.findIndex(function(d) { return d.slug === slug; });
+            var draft = {
+                title: title,
+                slug: slug,
+                category: category,
+                image: image,
+                content: content,
+                updated: new Date().toISOString()
+            };
+
+            if (existing >= 0) {
+                drafts[existing] = draft;
+            } else {
+                drafts.push(draft);
+            }
+
+            localStorage.setItem(BLOG_KEY, JSON.stringify(drafts));
+            renderBlogDrafts();
+            clearBlogForm();
+            showToast();
+        }
+
+        function renderBlogDrafts() {
+            var list = document.getElementById('blog-drafts');
+            var drafts = getBlogDrafts();
+            if (!drafts.length) {
+                list.innerHTML = '<p style="color:#999;font-size:14px;">No saved drafts yet.</p>';
+                return;
+            }
+            list.innerHTML = drafts.map(function(d, i) {
+                var preview = d.content.replace(/<[^>]+>/g, '').substring(0, 120);
+                return '<div style="background:#f8f9fa;border-radius:8px;padding:15px;margin-bottom:10px;border-left:3px solid #1abc9c;">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+                    '<div><strong>' + escapeHtml(d.title) + '</strong> <span style="color:#999;font-size:12px;">(' + escapeHtml(d.slug) + ')</span></div>' +
+                    '<div><span style="background:#1abc9c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;">' + escapeHtml(d.category) + '</span></div>' +
+                    '</div>' +
+                    '<p style="font-size:12px;color:#666;margin:5px 0;">' + escapeHtml(preview) + '...</p>' +
+                    '<div style="display:flex;gap:8px;">' +
+                    '<button onclick="editBlogDraft(' + i + ')" style="background:#3498db;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Edit</button>' +
+                    '<button onclick="exportBlogDraft(' + i + ')" style="background:#f39c12;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Export HTML</button>' +
+                    '<button onclick="deleteBlogDraft(' + i + ')" style="background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Delete</button>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        function editBlogDraft(i) {
+            var drafts = getBlogDrafts();
+            var d = drafts[i];
+            document.getElementById('blog-title').value = d.title;
+            document.getElementById('blog-slug').value = d.slug;
+            document.getElementById('blog-category').value = d.category;
+            document.getElementById('blog-image').value = d.image || '';
+            document.getElementById('blog-content').value = d.content;
+        }
+
+        function deleteBlogDraft(i) {
+            if (!confirm('Delete this draft?')) return;
+            var drafts = getBlogDrafts();
+            drafts.splice(i, 1);
+            localStorage.setItem(BLOG_KEY, JSON.stringify(drafts));
+            renderBlogDrafts();
+            showToast();
+        }
+
+        function clearBlogForm() {
+            document.getElementById('blog-title').value = '';
+            document.getElementById('blog-slug').value = '';
+            document.getElementById('blog-category').value = 'destinations';
+            document.getElementById('blog-image').value = '';
+            document.getElementById('blog-content').value = '';
+        }
+
+        function exportBlogHTML() {
+            var title = document.getElementById('blog-title').value.trim();
+            var slug = document.getElementById('blog-slug').value.trim();
+            var category = document.getElementById('blog-category').value;
+            var image = document.getElementById('blog-image').value.trim();
+            var content = document.getElementById('blog-content').value.trim();
+
+            if (!title || !content) { alert('Title and content are required.'); return; }
+            if (!slug) { slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+
+            var imgTag = image ? '<img src="' + image + '" alt="' + title + '" class="article-hero">' : '';
+            var template = '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+                '    <meta charset="UTF-8">\n' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '    <title>' + title + ' - FlyToAustralia.com</title>\n' +
+                '    <link rel="stylesheet" href="../css/style.css">\n' +
+                '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n' +
+                '</head>\n<body>\n' +
+                '    <!-- Navigation same as other pages -->\n' +
+                '    <nav class="navbar">\n' +
+                '        <div class="container">\n' +
+                '            <a href="../index.html" class="logo"><i class="fas fa-plane"></i> FlyToAustralia</a>\n' +
+                '            <button class="menu-toggle"><i class="fas fa-bars"></i></button>\n' +
+                '            <div class="nav-links">\n' +
+                '                <a href="../index.html">Home</a>\n' +
+                '                <a href="../destinations.html">Destinations</a>\n' +
+                '                <a href="../visa-guide.html">Visas</a>\n' +
+                '                <a href="../itineraries.html">Itineraries</a>\n' +
+                '                <a href="../blog.html">Blog</a>\n' +
+                '                <a href="../resources.html">Resources</a>\n' +
+                '                <a href="../contact.html">Contact</a>\n' +
+                '            </div>\n' +
+                '        </div>\n' +
+                '    </nav>\n\n' +
+                '    <section class="page-header">\n' +
+                '        <div class="container">\n' +
+                '            <h1>' + title + '</h1>\n' +
+                '            <p class="breadcrumb"><a href="../index.html">Home</a> / <a href="../blog.html">Blog</a> / ' + title + '</p>\n' +
+                '        </div>\n' +
+                '    </section>\n\n' +
+                '    <section class="article-content">\n' +
+                '        <div class="container">\n' +
+                '            ' + imgTag + '\n' +
+                '            ' + content + '\n' +
+                '        </div>\n' +
+                '    </section>\n\n' +
+                '    <!-- Footer same as other pages -->\n' +
+                '    <footer class="footer">\n' +
+                '        <div class="container">\n' +
+                '            <p>&copy; 2026 FlyToAustralia.com. All rights reserved.</p>\n' +
+                '        </div>\n' +
+                '    </footer>\n' +
+                '    <script src="../js/main.js"></script>\n' +
+                '</body>\n</html>';
+
+            // Create downloadable file
+            var blob = new Blob([template], { type: 'text/html' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = slug + '.html';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function exportBlogDraft(i) {
+            var drafts = getBlogDrafts();
+            var d = drafts[i];
+            document.getElementById('blog-title').value = d.title;
+            document.getElementById('blog-slug').value = d.slug;
+            document.getElementById('blog-category').value = d.category;
+            document.getElementById('blog-image').value = d.image || '';
+            document.getElementById('blog-content').value = d.content;
+            exportBlogHTML();
         }
     </script>
 </body>

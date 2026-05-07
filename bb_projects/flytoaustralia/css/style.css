@@ -999,22 +999,25 @@ p {
 
 .duration-btn, .budget-btn {
     padding: 12px 24px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #1a73e8;
     border-radius: 50px;
-    background: white;
+    background: #1a73e8;
+    color: white;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .duration-btn:hover, .budget-btn:hover {
-    border-color: #1a73e8;
-    background: rgba(26,115,232,0.05);
+    background: #0d62d9;
+    border-color: #0d62d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26,115,232,0.3);
 }
 
 .duration-btn.selected, .budget-btn.selected {
-    border-color: #1a73e8;
-    background: #1a73e8;
+    border-color: #006994;
+    background: #006994;
     color: white;
 }
 
@@ -1455,22 +1458,25 @@ p {
 
 .interest-btn, .style-btn {
     padding: 12px 24px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #1a73e8;
     border-radius: 50px;
-    background: white;
+    background: #1a73e8;
+    color: white;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .interest-btn:hover, .style-btn:hover {
-    border-color: #1a73e8;
-    background: rgba(26,115,232,0.05);
+    background: #0d62d9;
+    border-color: #0d62d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26,115,232,0.3);
 }
 
 .interest-btn.selected, .style-btn.selected {
-    border-color: #1a73e8;
-    background: #1a73e8;
+    border-color: #006994;
+    background: #006994;
     color: white;
 }
 
