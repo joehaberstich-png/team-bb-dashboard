@@ -970,24 +970,54 @@ p {
 .builder-steps .step {
     background: white;
     border-radius: 12px;
-    padding: 30px;
+    padding: 25px 30px;
     margin-bottom: 20px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.06);
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .builder-steps .step .step-number {
+    width: 40px;
     min-width: 40px;
     height: 40px;
     background: #e0e0e0;
     color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
 .builder-steps .step.active .step-number {
     background: #1a73e8;
     color: white;
+}
+
+.duration-options, .budget-options, .interest-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+}
+
+.step-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #666;
 }
 
 .duration-options, .budget-options {
