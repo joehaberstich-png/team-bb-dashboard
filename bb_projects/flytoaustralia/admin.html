@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlyToAustralia — Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-body { background: #f0f2f5; font-family: 'Poppins', sans-serif; }
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .admin-header { background: #1a252f; color: white; padding: 20px 30px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .admin-header h1 { margin: 0; font-size: 22px; }
+        .admin-user { font-size: 14px; opacity: 0.8; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .admin-tab { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; background: white; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .admin-tab.active { background: #1abc9c; color: white; }
+        .admin-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .admin-card h3 { margin: 0 0 15px 0; color: #2c3e50; }
+        .affiliate-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .affiliate-row:last-child { border-bottom: none; }
+        .affiliate-row .label { min-width: 150px; font-size: 13px; color: #666; }
+        .affiliate-row input { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .affiliate-row .save-btn { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .affiliate-row .save-btn:hover { background: #218838; }
+        .saved-toast { position: fixed; bottom: 30px; right: 30px; background: #28a745; color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; display: none; animation: slideUp 0.3s ease; z-index: 9999; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 360px; }
+        .login-box h2 { margin: 0 0 10px 0; color: #2c3e50; }
+        .login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 14px; box-sizing: border-box; }
+        .login-box button { width: 100%; padding: 12px; background: #1abc9c; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
+        .login-box .error { color: #e74c3c; font-size: 13px; margin-top: 10px; display: none; }
+        .login-box .hint { color: #aaa; font-size: 11px; margin-top: 15px; text-align: center; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .meta-card { background: #f8f9fa; border-radius: 8px; padding: 15px; }
+        .meta-card h4 { margin: 0 0 8px 0; font-size: 14px; }
+        .meta-card .page-url { font-size: 11px; color: #999; margin-bottom: 8px; word-break: break-all; }
+        .meta-card input, .meta-card textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .password-field { position: relative; }
+        .password-field .toggle-pw { position: absolute; right: 12px; top: 12px; cursor: pointer; color: #999; }
+        .section-desc { font-size: 13px; color: #888; margin: -10px 0 20px 0; }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> Admin Login</h2>
+            <p>Enter password to manage FlyToAustralia.com</p>
+            <div class="password-field">
+                <input type="password" id="admin-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') tryLogin()">
+                <span class="toggle-pw" onclick="togglePw()"><i class="fas fa-eye"></i></span>
+            </div>
+            <button onclick="tryLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <div id="login-error" class="error">Incorrect password</div>
+            <div class="hint">Default: admin123 — change in settings tab</div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" style="display:none;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-cog"></i> FlyToAustralia Admin</h1>
+                <div><span class="admin-user"><i class="fas fa-user"></i> <span id="admin-name">Admin</span></span> <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchTab('affiliates', this)"><i class="fas fa-link"></i> Affiliate Links</button>
+                <button class="admin-tab" onclick="switchTab('pages', this)"><i class="fas fa-file-alt"></i> Page Meta</button>
+                <button class="admin-tab" onclick="switchTab('settings', this)"><i class="fas fa-wrench"></i> Settings</button>
+                <button class="admin-tab" onclick="switchTab('guide', this)"><i class="fas fa-book"></i> Buyer Guide</button>
+            </div>
+
+            <!-- Affiliate Links Tab -->
+            <div id="tab-affiliates" class="admin-card">
+                <h3><i class="fas fa-link"></i> Affiliate Link Manager</h3>
+                <p class="section-desc">Edit affiliate links below. Changes save to localStorage and apply site-wide.</p>
+                <div id="affiliate-list"></div>
+                <button class="btn" style="margin-top:15px;background:#3498db;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;" onclick="addAffiliate()">
+                    <i class="fas fa-plus"></i> Add Custom Affiliate Link
+                </button>
+            </div>
+
+            <!-- Page Meta Tab -->
+            <div id="tab-pages" class="admin-card" style="display:none;">
+                <h3><i class="fas fa-file-alt"></i> Page Metadata</h3>
+                <p class="section-desc">Edit meta titles and descriptions for SEO. Dark-bordered = main pages.</p>
+                <div id="pages-list" class="meta-grid"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="admin-card" style="display:none;">
+                <h3><i class="fas fa-wrench"></i> Settings</h3>
+                <div style="margin-bottom:20px;">
+                    <label><strong>Admin Password</strong></label>
+                    <input type="text" id="settings-password" style="width:300px;padding:8px;border:1px solid #ddd;border-radius:5px;display:block;margin-top:5px;" placeholder="Change admin password">
+                    <button class="btn" style="margin-top:10px;background:#28a745;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;" onclick="savePassword()">Save Password</button>
+                </div>
+                <div>
+                    <label><strong>Site Name (footer copyright)</strong></label>
+                    <input type="text" id="settings-sitename" style="width:300px;padding:8px;border:1px solid #ddd;border-radius:5px;display:block;margin-top:5px;">
+                    <button class="btn" style="margin-top:10px;background:#28a745;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;" onclick="saveSiteName()">Save</button>
+                </div>
+            </div>
+
+            <!-- Buyer Guide Tab -->
+            <div id="tab-guide" class="admin-card" style="display:none;">
+                <h3><i class="fas fa-book"></i> Buyer's User Guide</h3>
+                <div id="buyer-guide-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="saved-toast" class="saved-toast"><i class="fas fa-check-circle"></i> Saved</div>
+
+    <script>
+        // ==============================
+        // DATA
+        // ==============================
+        const DEFAULT_PASSWORD = 'admin123';
+        const STORAGE_KEY = 'flytoaustralia_admin';
+        const AFFILIATES_KEY = 'flytoaustralia_affiliates';
+        const META_KEY = 'flytoaustralia_meta';
+
+        const DEFAULT_AFFILIATES = [
+            { id: 'skyscanner', label: 'Flights (Skyscanner)', url: 'https://www.skyscanner.com' },
+            { id: 'booking', label: 'Hotels (Booking.com)', url: 'https://www.booking.com' },
+            { id: 'rentalcars', label: 'Car Rentals', url: 'https://www.rentalcars.com' },
+            { id: 'worldnomads', label: 'Travel Insurance', url: 'https://www.worldnomads.com' },
+            { id: 'viator', label: 'Tours (Viator)', url: 'https://www.viator.com' },
+            { id: 'qantas', label: 'Flights (Qantas)', url: 'https://www.qantas.com' },
+            { id: 'jetstar', label: 'Flights (Jetstar)', url: 'https://www.jetstar.com' },
+            { id: 'airbnb', label: 'Accommodation (Airbnb)', url: 'https://www.airbnb.com.au' },
+            { id: 'hostelworld', label: 'Hostels', url: 'https://www.hostelworld.com' },
+            { id: 'thrifty', label: 'Car Rentals (Thrifty)', url: 'https://www.thrifty.com' },
+        ];
+
+        const PAGES = [
+            { key: 'index', title: 'Home', desc: 'Australia Travel Guide & Resources' },
+            { key: 'destinations', title: 'Destinations', desc: 'Explore Australia\'s top destinations' },
+            { key: 'visa-guide', title: 'Visa Guide', desc: 'Complete Australia visa requirements' },
+            { key: 'itineraries', title: 'Itineraries', desc: 'Plan your Australia trip' },
+            { key: 'blog', title: 'Blog', desc: 'Australia travel tips & guides' },
+            { key: 'resources', title: 'Resources', desc: 'Essential travel resources' },
+            { key: 'about', title: 'About', desc: 'About FlyToAustralia.com' },
+            { key: 'contact', title: 'Contact', desc: 'Get in touch' },
+            { key: 'faq', title: 'FAQ', desc: 'Frequently asked questions' },
+            { key: 'tourist-visa-guide', title: 'Tourist Visa Guide', desc: 'Tourist visa requirements' },
+            { key: 'working-holiday-visa-guide', title: 'Working Holiday Visa', desc: 'WHV requirements' },
+            { key: 'student-visa-guide', title: 'Student Visa Guide', desc: 'Student visa information' },
+            { key: 'partner-visa-guide', title: 'Partner Visa', desc: 'Partner visa requirements' },
+            { key: 'tools', title: 'Tools & Calculators', desc: 'Travel planning tools' },
+        ];
+
+        // ==============================
+        // AUTH
+        // ==============================
+        function loadSettings() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { password: DEFAULT_PASSWORD, sitename: 'FlyToAustralia.com' }; }
+            catch(e) { return { password: DEFAULT_PASSWORD, sitename: 'FlyToAustralia.com' }; }
+        }
+
+        function tryLogin() {
+            var pw = document.getElementById('admin-password').value;
+            var settings = loadSettings();
+            if (pw === settings.password) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadAll();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('admin-password').value = '';
+        }
+
+        function togglePw() {
+            var el = document.getElementById('admin-password');
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        // ==============================
+        // AFFILIATE LINKS
+        // ==============================
+        function getAffiliates() {
+            try {
+                var d = JSON.parse(localStorage.getItem(AFFILIATES_KEY));
+                if (d && d.length) return d;
+            } catch(e) {}
+            localStorage.setItem(AFFILIATES_KEY, JSON.stringify(DEFAULT_AFFILIATES));
+            return DEFAULT_AFFILIATES;
+        }
+
+        function renderAffiliates() {
+            var list = document.getElementById('affiliate-list');
+            var affs = getAffiliates();
+            list.innerHTML = affs.map(function(a, i) {
+                return '<div class="affiliate-row">' +
+                    '<span class="label">' + escapeHtml(a.label) + '</span>' +
+                    '<input type="url" id="aff-url-' + i + '" value="' + escapeHtml(a.url) + '" placeholder="https://...">' +
+                    '<button class="save-btn" onclick="saveAffiliate(' + i + ')"><i class="fas fa-check"></i> Save</button>' +
+                    '<button class="save-btn" style="background:#e74c3c;" onclick="deleteAffiliate(' + i + ')"><i class="fas fa-trash"></i></button>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function saveAffiliate(i) {
+            var affs = getAffiliates();
+            var url = document.getElementById('aff-url-' + i).value.trim();
+            if (!url) return;
+            affs[i].url = url;
+            localStorage.setItem(AFFILIATES_KEY, JSON.stringify(affs));
+            showToast();
+        }
+
+        function deleteAffiliate(i) {
+            if (!confirm('Delete this affiliate link?')) return;
+            var affs = getAffiliates();
+            affs.splice(i, 1);
+            localStorage.setItem(AFFILIATES_KEY, JSON.stringify(affs));
+            renderAffiliates();
+            showToast();
+        }
+
+        function addAffiliate() {
+            var label = prompt('Enter a label for this affiliate link:', 'New Partner');
+            if (!label) return;
+            var url = prompt('Enter the affiliate URL:', 'https://');
+            if (!url) return;
+            var affs = getAffiliates();
+            affs.push({ id: 'custom-' + Date.now(), label: label, url: url });
+            localStorage.setItem(AFFILIATES_KEY, JSON.stringify(affs));
+            renderAffiliates();
+            showToast();
+        }
+
+        // ==============================
+        // PAGE META
+        // ==============================
+        function getMeta() {
+            try { return JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch(e) { return {}; }
+        }
+
+        function renderPages() {
+            var list = document.getElementById('pages-list');
+            var meta = getMeta();
+            list.innerHTML = PAGES.map(function(p) {
+                var m = meta[p.key] || {};
+                return '<div class="meta-card">' +
+                    '<h4>' + escapeHtml(p.title) + '</h4>' +
+                    '<div class="page-url">' + p.key + '.html</div>' +
+                    '<input type="text" id="meta-title-' + p.key + '" value="' + escapeHtml(m.title || p.desc + ' - FlyToAustralia.com') + '" placeholder="Meta Title">' +
+                    '<textarea rows="2" id="meta-desc-' + p.key + '" placeholder="Meta Description">' + escapeHtml(m.description || '') + '</textarea>' +
+                    '<button class="save-btn" onclick="saveMeta(\'' + p.key + '\')"><i class="fas fa-check"></i> Save Meta</button>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function saveMeta(key) {
+            var meta = getMeta();
+            meta[key] = {
+                title: document.getElementById('meta-title-' + key).value,
+                description: document.getElementById('meta-desc-' + key).value
+            };
+            localStorage.setItem(META_KEY, JSON.stringify(meta));
+            showToast();
+        }
+
+        // ==============================
+        // SETTINGS
+        // ==============================
+        function savePassword() {
+            var pw = document.getElementById('settings-password').value;
+            if (!pw || pw.length < 4) { alert('Password must be at least 4 characters'); return; }
+            var settings = loadSettings();
+            settings.password = pw;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+            showToast();
+        }
+
+        function saveSiteName() {
+            var name = document.getElementById('settings-sitename').value;
+            var settings = loadSettings();
+            settings.sitename = name;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+            showToast();
+        }
+
+        // ==============================
+        // BUYER GUIDE
+        // ==============================
+        function renderBuyerGuide() {
+            document.getElementById('buyer-guide-content').innerHTML = `
+                <div style="line-height:1.8;color:#444;">
+                    <h1 style="color:#2c3e50;font-size:24px;">FlyToAustralia.com — Buyer's User Guide</h1>
+                    <p style="color:#666;margin:-10px 0 20px;">Everything you need to know to run and grow your new site.</p>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">📋 What You Own</h3>
+                    <ul>
+                        <li><strong>Domain:</strong> flytoaustralia.com</li>
+                        <li><strong>35 HTML pages</strong> — Mobile-friendly, SEO-optimized</li>
+                        <li><strong>12 blog articles</strong> — Sydney, Melbourne, Great Barrier Reef, Uluru, Daintree, Gold Coast, Blue Mountains, Whitsundays, Perth, relocation, working holiday, student visa</li>
+                        <li><strong>Interactive itinerary builder</strong> — JavaScript trip planner</li>
+                        <li><strong>Custom CSS</strong> — 2,235 lines, mobile-first</li>
+                        <li><strong>Full source code</strong> — Hosted on GitHub (repo transfers on sale)</li>
+                    </ul>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">🚀 How to Launch</h3>
+                    <ol>
+                        <li><strong>Host the site</strong> — Upload to any static host (Netlify, Vercel, GitHub Pages, Cloudflare Pages). All free tiers work.</li>
+                        <li><strong>Point the domain</strong> — Update DNS A/AAAA records or CNAME to your host.</li>
+                        <li><strong>Set up email</strong> — Free forwarding via Cloudflare or Zoho.</li>
+                    </ol>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">💰 How to Monetize</h3>
+                    <h4 style="margin-top:15px;">Step 1: Affiliate Programs (Start Immediately)</h4>
+                    <p>Sign up for these affiliate programs and replace the placeholder links:</p>
+                    <table style="width:100%;border-collapse:collapse;margin:10px 0;">
+                        <tr style="background:#f8f9fa;"><td style="padding:8px;border:1px solid #ddd;">✈️ Flights</td><td style="padding:8px;border:1px solid #ddd;">Skyscanner Partners, Qantas Affiliate, Trip.com</td></tr>
+                        <tr><td style="padding:8px;border:1px solid #ddd;">🏨 Hotels</td><td style="padding:8px;border:1px solid #ddd;">Booking.com, Agoda, Expedia Partner Solutions</td></tr>
+                        <tr style="background:#f8f9fa;"><td style="padding:8px;border:1px solid #ddd;">🎟️ Tours</td><td style="padding:8px;border:1px solid #ddd;">Viator (Tripadvisor), GetYourGuide, Klook</td></tr>
+                        <tr><td style="padding:8px;border:1px solid #ddd;">🛡️ Insurance</td><td style="padding:8px;border:1px solid #ddd;">World Nomads, SafetyWing, Allianz Travel</td></tr>
+                        <tr style="background:#f8f9fa;"><td style="padding:8px;border:1px solid #ddd;">🚗 Car Rental</td><td style="padding:8px;border:1px solid #ddd;">Rentalcars.com, Discover Cars</td></tr>
+                    </table>
+                    <p><strong>To update links:</strong> Open admin panel → Affiliate Links tab → paste your affiliate URLs → Save.</p>
+
+                    <h4 style="margin-top:20px;">Step 2: Display Ads (at 50K sessions/month)</h4>
+                    <p>Apply to Mediavine or Raptive. They require ~50K monthly sessions. Add their ad code to the &lt;head&gt; of each page.</p>
+
+                    <h4 style="margin-top:20px;">Step 3: Digital Products (Scaling)</h4>
+                    <p>Create an Australia travel planning course or ebook. Sell via Whop, Gumroad, or Teachable. Link from the Tools page.</p>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">📈 How to Get Traffic</h3>
+                    <ul>
+                        <li><strong>SEO (free):</strong> Target long-tail keywords: "working holiday visa Australia requirements 2026", "how much does a trip to Australia cost", "best time to visit Australia". Add 2-3 new articles/month.</li>
+                        <li><strong>Backlinks:</strong> Submit to Australia travel directories, tourism board resource pages, guest post on travel blogs.</li>
+                        <li><strong>Social:</strong> Pinterest (travel boards), Instagram (Australia photos → link in bio), Reddit (r/AustraliaTravel, r/backpacking).</li>
+                        <li><strong>Google Business Profile:</strong> Create one for "FlyToAustralia.com" as a travel agency (even if digital-only).</li>
+                    </ul>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">🔧 Maintenance</h3>
+                    <ul>
+                        <li><strong>Update visa info annually</strong> — Australia changes visa rules frequently. Keep the visa pages current.</li>
+                        <li><strong>Check affiliate links monthly</strong> — Use a broken link checker to ensure all links still work.</li>
+                        <li><strong>Add articles regularly</strong> — Fresh content = better SEO rankings.</li>
+                        <li><strong>Review pricing</strong> — Update flight/hotel cost estimates every 6 months.</li>
+                    </ul>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">⚠️ Compliance</h3>
+                    <ul>
+                        <li>Affiliate disclosure is in the footer and on each article.</li>
+                        <li>Privacy Policy and Terms pages are included — review for your jurisdiction.</li>
+                        <li>If collecting emails, ensure GDPR/CAN-SPAM compliance.</li>
+                    </ul>
+
+                    <h3 style="color:#1abc9c;margin-top:25px;">🆘 Need Help?</h3>
+                    <p>The seller is available for transition support. Contact via Flippa or email.</p>
+                </div>
+            `;
+        }
+
+        // ==============================
+        // UTILITIES
+        // ==============================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function showToast() {
+            var toast = document.getElementById('saved-toast');
+            toast.style.display = 'block';
+            setTimeout(function() { toast.style.display = 'none'; }, 2000);
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
+            btn.classList.add('active');
+            document.querySelectorAll('.admin-card[id^="tab-"]').forEach(function(c) { c.style.display = 'none'; });
+            document.getElementById('tab-' + tab).style.display = 'block';
+        }
+
+        function loadAll() {
+            var settings = loadSettings();
+            document.getElementById('settings-password').value = settings.password;
+            document.getElementById('settings-sitename').value = settings.sitename || 'FlyToAustralia.com';
+            renderAffiliates();
+            renderPages();
+            renderBuyerGuide();
+        }
+    </script>
+</body>
+</html>
